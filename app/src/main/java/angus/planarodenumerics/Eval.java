@@ -3,9 +3,9 @@ package angus.planarodenumerics;
 public class Eval {
 
     public static double eval(String s, double x, double y) {
-        // TODO: move this elsewhere so it's not called so many times
-        s = s.replace(" ", "");
-        // The order of operations: (), sin, cos, tan, log, ln, ^, * and /, + and -
+        //s = s.replace(" ", "");
+
+        // The order of operations: (), functions (eg. log), ^, * and /, + and -
 
         // Search for the right most, lowest precedence operator that's not in brackets
         int bracket_level_count = 0;
@@ -86,27 +86,10 @@ public class Eval {
         }
 
         // Search for the left most function
-        if (s.length() > 2) {
-            if (s.substring(0,2).equals("ln")) {
-                return Math.log(eval(s.substring(2), x, y));
-            }
-        }
-        if (s.length() > 3) {
-            String s3 = s.substring(0,3);
-            if (s3.equals("sin")) {
-                return Math.sin(eval(s.substring(3), x, y));
-            }
-            if (s3.equals("cos")) {
-                return Math.cos(eval(s.substring(3), x, y));
-            }
-            if (s3.equals("tan")) {
-                return Math.tan(eval(s.substring(3), x, y));
-            }
-            if (s3.equals("log")) {
-                return Math.log(eval(s.substring(3), x, y));
-            }
-            if (s3.equals("abs")) {
-                return Math.abs(eval(s.substring(3), x, y));
+        // Ordering longest to shortest is important to avoid cosecx being evaluated as cos(ecx)
+        if (s.length() > 5) {
+            if (s.substring(0,5).equals("cosec")) {
+                return 1 / Math.sin(eval(s.substring(5), x, y));
             }
         }
         if (s.length() > 4) {
@@ -133,8 +116,36 @@ public class Eval {
                 return Math.atan(eval(s.substring(4), x, y));
             }
         }
-        // TODO: inverse hyperbolic trig?
-        // TODO: functions that take two variables - eg logs with different bases
+        if (s.length() > 3) {
+            String s3 = s.substring(0,3);
+            if (s3.equals("sin")) {
+                return Math.sin(eval(s.substring(3), x, y));
+            }
+            if (s3.equals("cos")) {
+                return Math.cos(eval(s.substring(3), x, y));
+            }
+            if (s3.equals("tan")) {
+                return Math.tan(eval(s.substring(3), x, y));
+            }
+            if (s3.equals("log")) {
+                return Math.log(eval(s.substring(3), x, y));
+            }
+            if (s3.equals("abs")) {
+                return Math.abs(eval(s.substring(3), x, y));
+            }
+            if (s3.equals("cot")) {
+                return 1 / Math.tan(eval(s.substring(3), x, y));
+            }
+            if (s3.equals("sec")) {
+                return 1 / Math.cos(eval(s.substring(3), x, y));
+            }
+        }
+        if (s.length() > 2) {
+            if (s.substring(0,2).equals("ln")) {
+                return Math.log(eval(s.substring(2), x, y));
+            }
+        }
+        // TODO: functions that take two variables - eg logs with different bases, atan2
 
         // Search for the right most bracket juxtaposition (to be treated as multiplication)
         bracket_level_count = 0;

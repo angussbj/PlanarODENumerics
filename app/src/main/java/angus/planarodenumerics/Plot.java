@@ -7,7 +7,6 @@ import android.graphics.Paint;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays; // For debugging
 import java.util.Random;
 
 public class Plot {
@@ -24,46 +23,52 @@ public class Plot {
     private String y_dot;
     private int[] pixels;
     private int border;
+    private double[] shortest_vector_drawn = new double[]{0, 0, Double.POSITIVE_INFINITY};
+    public int max_steps;
+    private int arrow_size;
 
-    public Plot(double xmn, double xmx, double ymn, double ymx, String xd, String yd, int xpx, int ypx, int bdr) {
+    Plot(double xmn, double xmx, double ymn, double ymx, String xd, String yd, int xpx, int ypx,
+         int bdr, int max_stps, int arr_size) {
         border = bdr;
         x_pixels = xpx - border;
         y_pixels = ypx - border;
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
         bmp = Bitmap.createBitmap(x_pixels + border, y_pixels + border, conf);
         pixels = new int[(x_pixels + border) * (y_pixels + border)];
-        for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = Color.BLACK;
-        }
+        make_black();
         x_max = xmx;
         y_max = ymx;
         x_min = xmn;
         y_min = ymn;
         x_scale = x_pixels / (x_max - x_min);
-        y_scale = y_pixels / (y_min - y_max);   // note that this scales in reverse so y can have up
-                                                // as positive even though pixels don't
+        y_scale = y_pixels / (y_max - y_min);
         x_dot = xd;
         y_dot = yd;
+        max_steps = max_stps;
+        arrow_size = arr_size;
     }
 
-    public Plot(double xmn, double xmx, double ymn, double ymx, String xd, String yd, int bdr, Bitmap bitmap) {
-        border = bdr;
-        bmp = bitmap;
-        x_pixels = bmp.getWidth() - border;
-        y_pixels = bmp.getHeight() - border;
-        pixels = new int[(x_pixels + border) * (y_pixels + border)];
-        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-        x_max = xmx;
-        y_max = ymx;
-        x_min = xmn;
-        y_min = ymn;
-        x_scale = x_pixels / (x_max - x_min);
-        y_scale = y_pixels / (y_min - y_max);   // note that this scales in reverse so y can have up
-        // as positive even though pixels don't
-        x_dot = xd;
-        y_dot = yd;
+    public void resetBoundsTranslated(float X, float Y) {
+        double dx = X / x_scale;
+        double dy = Y / y_scale;
+        x_max -= dx;
+        y_max += dy;
+        x_min -= dx;
+        y_min += dy;
     }
 
+    public void resetBoundsTranslatedScaled(float X, float Y, float scaleFactor) {
+        double old_x_width = x_max - x_min;
+        double old_y_height = y_max - y_min;
+        x_scale *= scaleFactor;
+        y_scale *= scaleFactor;
+        x_min -= X / x_scale;
+        x_max = x_min + old_x_width / scaleFactor;
+        y_max += Y / y_scale;
+        y_min = y_max - old_y_height / scaleFactor;
+    }
+
+    // TODO: move these to AMath
     private double sin(double n) {
         return Math.sin(n * Math.PI / 180);
     }
@@ -78,7 +83,7 @@ public class Plot {
 
     private int[] pixel_coords(double x, double y) {
         int i = (int) ((x - x_min) * x_scale) + border;
-        int j = (int) (y_pixels + (y - y_min) * y_scale);
+        int j = (int) ((y_max - y) * y_scale);
         return new int[]{i, j};
     }
 
@@ -88,14 +93,22 @@ public class Plot {
     }
 
     private int pixel_coord_j(double y) {
-        int j = (int) (y_pixels + (y - y_min) * y_scale);
+        int j = (int) ((y_max - y) * y_scale);
         return j;
     }
 
     private double[] real_coords(int i, int j) {
-        double x = (double) (i - border) / x_scale + x_min;
-        double y = (double) j / y_scale - y_min;
+        double x = (i - border) / x_scale + x_min;
+        double y = y_max - j / y_scale;
         return new double[]{x, y};
+    }
+
+    public String real_coords_string(int i, int j) {
+        double[] X = real_coords(i, j);
+        MathContext mathContext = new MathContext(3);
+        BigDecimal x = new BigDecimal(X[0], mathContext);
+        BigDecimal y = new BigDecimal(X[1], mathContext);
+        return "(" + x.toString() + ", " + y.toString() + ")";
     }
 
     private boolean in_frame(int i, int j) {
@@ -107,7 +120,7 @@ public class Plot {
     }
 
     // TODO: Consider rewriting to not care which end is which
-    private void draw_line(double start_x, double start_y, double end_x, double end_y, int colour, boolean frame_override) {
+    void draw_line(double start_x, double start_y, double end_x, double end_y, int colour, boolean frame_override) {
         int[] start_coords = pixel_coords(start_x, start_y);
         int[] end_coords = pixel_coords(end_x, end_y);
         int start_i = start_coords[0];
@@ -151,18 +164,62 @@ public class Plot {
         }
     }
 
+    void draw_line(int start_i, int start_j, int end_i, int end_j, int colour, boolean frame_override) {
+        int x = end_i - start_i;
+        int y = end_j - start_j;
+        if (Math.abs(x) >= Math.abs(y)) {
+            if (x > 0) {
+                for (int i = 0; i < x; i++) {
+                    int j = (int) ((double)y * i / x);
+                    if (in_frame(start_i + i, start_j + j) || frame_override) {
+                        setPixel(start_i + i, start_j + j, colour);
+                    }
+                }
+            } else {
+                for (int i = 0; i > x; i--) {
+                    int j = (int) ((double)y * i / x);
+                    if (in_frame(start_i + i, start_j + j) || frame_override) {
+                        setPixel(start_i + i, start_j + j, colour);
+                    }
+                }
+            }
+        } else {
+            if (y > 0) {
+                for (int j = 0; j < y; j++) {
+                    int i = (int) ((double)x * j / y);
+                    if (in_frame(start_i + i, start_j + j) || frame_override) {
+                        setPixel(start_i + i, start_j + j, colour);
+                    }
+                }
+            } else {
+                for (int j = 0; j > y; j--) {
+                    int i = (int) ((double)x * j / y);
+                    if (in_frame(start_i + i, start_j + j) || frame_override) {
+                        setPixel(start_i + i, start_j + j, colour);
+                    }
+                }
+            }
+        }
+    }
+
     private void draw_arrow(double start_x, double start_y, double x, double y, int colour) {
         // in order to centre the arrows on the given coordinates:
         start_x -= x/2;
         start_y -= y/2;
         double arrow_head_angle = 30;
         draw_line(start_x, start_y, start_x + x, start_y + y, colour, false);
-        double wing1_end_x = start_x + x + cos(180 - arrow_head_angle) * x/3 - sin(180 - arrow_head_angle) * y/3;
-        double wing1_end_y = start_y + y + sin(180 - arrow_head_angle) * x/3 + cos(180 - arrow_head_angle) * y/3;
-        double wing2_end_x = start_x + x + cos(180 + arrow_head_angle) * x/3 - sin(180 + arrow_head_angle) * y/3;
-        double wing2_end_y = start_y + y + sin(180 + arrow_head_angle) * x/3 + cos(180 + arrow_head_angle) * y/3;
-        draw_line(start_x + x, start_y + y, wing1_end_x, wing1_end_y, colour, false);
-        draw_line(start_x + x, start_y + y, wing2_end_x, wing2_end_y, colour, false);
+        int start_i = pixel_coord_i(start_x);
+        int start_j = pixel_coord_j(start_y);
+        double i = x * x_scale;
+        double j = - y * y_scale;
+        int end_i = (int) Math.round((start_i + i));
+        int end_j = (int) Math.round((start_j + j));
+        int wing1_end_i = (int) Math.round(end_i + cos(180 - arrow_head_angle) * i/3 - sin(180 - arrow_head_angle) * j/3);
+        int wing1_end_j = (int) Math.round(end_j + sin(180 - arrow_head_angle) * i/3 + cos(180 - arrow_head_angle) * j/3);
+        int wing2_end_i = (int) Math.round(end_i + cos(180 + arrow_head_angle) * i/3 - sin(180 + arrow_head_angle) * j/3);
+        int wing2_end_j = (int) Math.round(end_j + sin(180 + arrow_head_angle) * i/3 + cos(180 + arrow_head_angle) * j/3);
+        draw_line(end_i, end_j, wing1_end_i, wing1_end_j, colour, false);
+        draw_line(end_i, end_j, wing2_end_i, wing2_end_j, colour, false);
     }
 
     /**  returns a list of n values, each value in the centre of one of n equal length disjoint
@@ -186,10 +243,10 @@ public class Plot {
         return output;
     }
 
-    public void draw_vector_field() {
+    void draw_vector_field() {
         // TODO: Add big arrows mode for people with poor vision
-        double[] x_samples = m_linspace(x_min, x_max, x_pixels / 45);
-        double[] y_samples = m_linspace(y_min, y_max, y_pixels / 45);
+        double[] x_samples = m_linspace(x_min, x_max, x_pixels / arrow_size);
+        double[] y_samples = m_linspace(y_min, y_max, y_pixels / arrow_size);
         double max_arrow_length = 0;
         double[][] arrows = new double[x_samples.length * y_samples.length][4];
         for (int i = 0; i < x_samples.length; i++) {
@@ -201,31 +258,33 @@ public class Plot {
                 double dy = Eval.eval(y_dot, x, y);
                 double l = Math.sqrt(dx*dx + dy*dy);
                 if (l > max_arrow_length) {max_arrow_length = l;}
-                arrows[i + j * x_samples.length] = new double[]{x, y, dx, dy};
+                if (l < shortest_vector_drawn[2]) { shortest_vector_drawn = new double[]{x, y, l}; }
+                    // shortest vector is used when drawing curves
+                arrows[i + j * x_samples.length] = new double[]{x, y, dx, dy, l};
             }
         }
         double max_display_dx = x_samples[1] - x_samples[0];
         double max_display_dy = y_samples[1] - y_samples[0];
         for (int i = 0; i < arrows.length; i++) {
-            double dx = max_display_dx * arrows[i][2] / max_arrow_length;
-            double dy = max_display_dy * arrows[i][3] / max_arrow_length;
-            draw_arrow(arrows[i][0], arrows[i][1], dx, dy, Color.WHITE);
+            // display scaling is so that you can still see the direction of 'very short' arrows
+            double display_length = 4 * arrows[i][4] / 5 + max_arrow_length / 5;
+            double display_scaling = display_length / arrows[i][4];
+            double dx = display_scaling * max_display_dx * arrows[i][2] / max_arrow_length;
+            double dy = display_scaling * max_display_dy * arrows[i][3] / max_arrow_length;
+            int greyness = (int) (127 + Math.round(128 * arrows[i][4] / max_arrow_length));
+            draw_arrow(arrows[i][0], arrows[i][1], dx, dy, Color.rgb(greyness, greyness, greyness));
         }
     }
 
+    // This method creates up to two DrawCurveToArray runnables and runs them on separate threads
+    void draw_soln(int i, int j, boolean do_forwards, boolean do_backwards) {
 
-    // The following methods draw solution curves for given ICs using RK4
-
-    // This is the public method that does the drawing and stuff.
-    public void draw_soln(int i, int j) {
-
-        // Choose a random colour
+        // Choose a random colour (that's not too dark)
         Random rnd = new Random();
-        int r = rnd.nextInt(256);
-        int g = rnd.nextInt(256);
-        int b = rnd.nextInt(256);
+        int r = 64 + rnd.nextInt(192);
+        int g = 64 + rnd.nextInt(192);
+        int b = 64 + rnd.nextInt(192);
         int col = Color.rgb(r, g, b);
-
         // Draw a box at the tap location
         for (int k = -2; k < 3; k++) {
             for (int l = -2; l < 3; l++) {
@@ -234,155 +293,52 @@ public class Plot {
         }
 
         // Draw the solution
-        // TODO: make these variables accessible to the user
-        double T = 8;
-        double dt = 0.1;
-        boolean forwards = true;
-        boolean backwards = true;
-        double x;
-        double y;
-        double[] X;
-        double x_length;
-        double y_length;
-        double t;
+        double[] X = real_coords(i, j);
+        double x = X[0];
+        double y = X[1];
         double pixel_length = real_coords(1, 0)[0] - real_coords(0,0)[0];
-        // The following booleans and all their occurrences deal with 'very' non-linear situations
-        // Basically they let us say dt is too big, but when we halve it it's too small, so just
-        // use it anyway (or the same statement with dt too small but 2*dt too big).
-        boolean increased_dt = false;
-        boolean decreased_dt = false;
-        if (forwards) {
-            X = real_coords(i, j);
-            x = X[0];
-            y = X[1];
-            t = 0;
-            // TODO: Sometimes jumps away from equilibria....
-            while (t < T) {
-                X = RK4_step(x, y, dt);
-                x_length = Math.abs(X[0] - x);
-                y_length = Math.abs(X[1] - y);
-                if (increased_dt && decreased_dt) {
-                    draw_line(x, y, X[0], X[1], col, false);
-                    t += dt;
-                    x = X[0];
-                    y = X[1];
-                    increased_dt = false;
-                    decreased_dt = false;
-                    //System.out.println("A"); // debugging
-                } else if (x_length < pixel_length && y_length < pixel_length) {
-                    if (dt > 1) {
-                        break;
-                    } else {
-                        dt *= 2;
-                        increased_dt = true;
-                        //System.out.println("B"); // debugging
-                    }
-                } else if (x_length > 4 * pixel_length || y_length > 4 * pixel_length) {
-                    // TODO: Test if multiplying by 4 is significantly faster than by 5
-                    dt /= 2;
-                    decreased_dt = true;
-                    //System.out.println("C"); // debugging
-                } else if (X[0] > x_max || X[0] < x_min || X[1] > y_max || X[1] < y_min) {
-                    break;
-                } else {
-                    draw_line(x, y, X[0], X[1], col, false);
-                    t += dt;
-                    x = X[0];
-                    y = X[1];
-                    increased_dt = false;
-                    decreased_dt = false;
-                    //System.out.println("D"); // debugging
-                }
+        // TODO: get a better short vector - maybe find equilibria
+        //double max_dt = 2 * pixel_length / shortest_vector_drawn[2];
+        if (do_forwards && do_backwards) {
+            DrawCurveToArray fwds = new DrawCurveToArray(x_dot, y_dot, x, y, 0.1,
+                    pixel_length, x_min, x_max, y_min, y_max, col, this);
+            Thread fwdThread = new Thread(fwds);
+            fwdThread.start();
+            DrawCurveToArray bwds = new DrawCurveToArray(x_dot, y_dot, x, y, -0.1,
+                    pixel_length, x_min, x_max, y_min, y_max, col, this);
+            Thread bwdThread = new Thread(bwds);
+            bwdThread.start();
+            try {
+                fwdThread.join();
+                bwdThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted");
+            }
+        } else if (do_forwards) {
+            DrawCurveToArray fwds = new DrawCurveToArray(x_dot, y_dot, x, y, 0.1,
+                    pixel_length, x_min, x_max, y_min, y_max, col, this);
+            Thread fwdThread = new Thread(fwds);
+            fwdThread.start();
+            try {
+                fwdThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted");
+            }
+        } else if (do_backwards) {
+            DrawCurveToArray bwds = new DrawCurveToArray(x_dot, y_dot, x, y, -0.1,
+                    pixel_length, x_min, x_max, y_min, y_max, col, this);
+            Thread bwdThread = new Thread(bwds);
+            bwdThread.start();
+            try {
+                bwdThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted");
             }
         }
-        increased_dt = false;
-        decreased_dt = false;
-        if (backwards) {
-            X = real_coords(i, j);
-            x = X[0];
-            y = X[1];
-            t = 0;
-            while (t > -T) {
-                X = RK4_step(x, y, -dt);
-                x_length = Math.abs(X[0] - x);
-                y_length = Math.abs(X[1] - y);
-                if (increased_dt && decreased_dt) {
-                    draw_line(x, y, X[0], X[1], col, false);
-                    t -= dt;
-                    x = X[0];
-                    y = X[1];
-                    increased_dt = false;
-                    decreased_dt = false;
-                    //System.out.println("E"); // debugging
-                } else if (x_length < pixel_length && y_length < pixel_length) {
-                    if (dt > 1) {
-                        break;
-                    } else {
-                        dt *= 2;
-                        increased_dt = true;
-                        //System.out.println("F"); // debugging
-                    }
-                } else if (x_length > 4 * pixel_length || y_length > 4 * pixel_length) {
-                    dt /= 2;
-                    decreased_dt = true;
-                    //System.out.println("G"); // debugging
-                } else if (X[0] > x_max || X[0] < x_min || X[1] > y_max || X[1] < y_min) {
-                    break;
-                } else {
-                    draw_line(x, y, X[0], X[1], col, false);
-                    t -= dt;
-                    x = X[0];
-                    y = X[1];
-                    increased_dt = false;
-                    decreased_dt = false;
-                    //System.out.println("H"); // debugging
-                }
-            }
-        }
-//        if (backwards) {
-//            X = real_coords(i, j);
-//            t = 0;
-//            while (t > -T) {
-//                x = X[0];
-//                y = X[1];
-//                X = RK4_step(x, y, -dt);
-//                draw_line(x, y, X[0], X[1], col, false);
-//                t -= dt;
-//            }
-//        }
-        // For use when debug string is in use (also change return type to String)
-        //return debug;
-    }
-
-    public double fx(double x, double y) {
-        double dx = Eval.eval(x_dot, x, y);
-        return dx;
-    }
-
-    public double fy(double x, double y) {
-        double dy = Eval.eval(y_dot, x, y);
-        return dy;
-    }
-
-    public double[] RK4_step(double x, double y, double dt) {
-        // TODO: See if there's a nice maths library that makes this neater
-        // TODO: At least stop doubling up on the calculations
-        double ix1 = dt * fx(x, y) / 2;
-        double iy1 = dt * fy(x, y) / 2;
-        double ix2 = dt * fx(x + ix1, y + iy1);
-        double iy2 = dt * fy(x + ix1, y + iy1);
-        double ix3 = dt * fx(x + ix2/2, y + iy2/2);
-        double iy3 = dt * fy(x + ix2/2, y + iy2/2);
-        double ix4 = dt * fx(x + ix3, y + iy3) / 2;
-        double iy4 = dt * fy(x + ix3, y + iy3) / 2;
-        x += (ix1 + ix2 + ix3 + ix4) / 3;
-        y += (iy1 + iy2 + iy3 + iy4) / 3;
-        return new double[]{x, y};
     }
 
     // This is the public method that adds the x and y axes and scales
-    public void draw_axes(int color) {
-
+    void draw_axes(int color) {
         // Set up tick spacings and tick positions
         double x_diff = x_max - x_min;
         double y_diff = y_max - y_min;
@@ -423,7 +379,6 @@ public class Plot {
             } else {
                 canvas.drawText(s, pixel_coord_i(x) - 6 * s.length(), bmp.getHeight() - 2 * border / 5, paint);
             }
-            System.out.println(s);
         }
         for (double y = first_y_mark; y < y_max; y += y_mark_spacing) {
             s = Double.toString(y);
@@ -437,12 +392,17 @@ public class Plot {
             } else {
                 canvas.drawText(s, border - 20 - 11 * s.length(), pixel_coord_j(y) + 8, paint);
             }
-            System.out.println(s);
         }
         bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
     }
 
-    public Bitmap giveBitmap() {
+    void make_black() {
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = Color.BLACK;
+        }
+    }
+
+    Bitmap getBitmap() {
         bmp.setPixels(pixels, 0, x_pixels + border, 0,0, x_pixels + border, y_pixels + border);
         return bmp;
     }

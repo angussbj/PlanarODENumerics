@@ -1,16 +1,15 @@
 package angus.planarodenumerics;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.widget.ImageView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class Graph extends AppCompatActivity {
+public class GraphActivity extends AppCompatActivity {
 
     String dxdt;
     String dydt;
@@ -18,11 +17,35 @@ public class Graph extends AppCompatActivity {
     double xmax;
     double ymin;
     double ymax;
+    int arrow_size;
+    int max_steps;
+    boolean do_forwards;
+    boolean do_backwards;
+    ZoomableImageView image;
+    boolean zoom;
+    boolean solution;
+    boolean coord;
+    Button zoomButton;
+    Button solutionButton;
+    Button coordButton;
+    TextView timeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
+
+        // Set up the toolbar buttons
+        zoomButton = findViewById(R.id.zoomButton);
+        solutionButton = findViewById(R.id.solutionButton);
+        coordButton = findViewById(R.id.coordButton);
+        solutionButton.setBackgroundColor(0xFF303F9F);              // Set to primary colour dark
+        zoom = false;
+        solution = true;
+        coord = false;
+
+        // Set up the other text output
+        timeView = findViewById(R.id.timeView);
 
         // Get the variables from the main activity
         Intent intent = getIntent();
@@ -32,6 +55,10 @@ public class Graph extends AppCompatActivity {
         xmax = Double.parseDouble(intent.getStringExtra(MainActivity.EXTRA_XMAX_KEY));
         ymin = Double.parseDouble(intent.getStringExtra(MainActivity.EXTRA_YMIN_KEY));
         ymax = Double.parseDouble(intent.getStringExtra(MainActivity.EXTRA_YMAX_KEY));
+        arrow_size = Integer.parseInt(intent.getStringExtra(MainActivity.EXTRA_ARROWSIZE_KEY));
+        max_steps = Integer.parseInt(intent.getStringExtra(MainActivity.EXTRA_MAXSTEPS_KEY));
+        do_forwards = intent.getBooleanExtra(MainActivity.EXTRA_FORWARDS_KEY, true);
+        do_backwards = intent.getBooleanExtra(MainActivity.EXTRA_BACKWARDS_KEY, true);
 
         // Write the equations up the top, so people know what graph they're looking at
         TextView dxdtView = findViewById(R.id.dxdtView);
@@ -39,59 +66,104 @@ public class Graph extends AppCompatActivity {
         // TODO: make this nicer
         dxdtView.setText("dx/dt = " + dxdt);
         dydtView.setText("dy/dt = " + dydt);
+
+        // Find the view we'll show the graph in
+        image = findViewById(R.id.graphView);
+        image.setOnTouchListener(onTouchListener);
     }
 
-    // This also happens when the activity is created, but after we can work out the dimensions of
-    // the image view
+    // This also happens when the activity is created, but later than onCreate, so we can work out
+    // the dimensions of the image view
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            // Find the view we'll show the graph in
-            ImageView image = (ImageView) findViewById(R.id.graphView);
-
             // Find width and height of the view
             int w = image.getWidth();
             int h = image.getHeight();
 
             // Create Plot object for plot and use it
-            Plot plt = new Plot(xmin, xmax, ymin, ymax, dxdt, dydt, w, h, 80);
-            plt.draw_vector_field();
-            plt.draw_axes(Color.WHITE);
-            image.setImageBitmap(plt.giveBitmap());
+            image.setPlot(new Plot(xmin, xmax, ymin, ymax, dxdt.replace(" ", ""),
+                    dydt.replace(" ", ""), w, h, 80, max_steps, arrow_size));
+            image.plt.draw_vector_field();
+            image.plt.draw_axes(Color.WHITE);
+            image.setImageBitmap(image.plt.getBitmap());
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int i = (int) event.getX();
-        int j = (int) event.getY();
-        if (event.getAction() == MotionEvent.ACTION_UP) {
+    View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            if (solution) {
+                int i = (int) event.getX();
+                int j = (int) event.getY();
+                if (event.getAction() == MotionEvent.ACTION_UP) {
 
-            long t = System.nanoTime(); // for timing for the sake of debug
+                    long t = System.nanoTime(); // for timing the computation
 
-            // Get currently displayed bitmap
-            ImageView image = (ImageView) findViewById(R.id.graphView);
-            Bitmap bmp = ((BitmapDrawable) image.getDrawable()).getBitmap();
+                    // get location of image on screen to adjust
+                    // TODO: turn this method into a listener so you don't have to do this
+                    int[] location = new int[2];
+                    image.getLocationOnScreen(location);
 
-            // Get the distance of the image from the top of the screen
-            int[] location = new int[2];
-            image.getLocationOnScreen(location);
-            int top_of_image_j = location[1];
-            if (j < top_of_image_j || j > top_of_image_j + image.getHeight()) {return false;}
-            // Create Plot object for plot and draw solution (Commented out lines allow debug messages)
-            // TODO: make the co-ordinates work when in landscape mode OR lock rotation
-            Plot plt = new Plot(xmin, xmax, ymin, ymax, dxdt, dydt, 80, bmp);
-            plt.draw_soln(i, j - top_of_image_j);
-            //String message = plt.draw_soln(i, j - delta_i - 140);
+                    // draw solution and get bitmap
+                    image.plt.draw_soln(i, j, do_forwards, do_backwards);
 
-            // Outputs
-            image.setImageBitmap(plt.giveBitmap());
-            String message = Double.toString( ((double) (System.nanoTime() - t) / 1000000000)) + " s";
-            TextView textView = findViewById(R.id.timeView);
-            textView.setText(message);
-            return true;
+                    // Outputs
+                    image.setImageBitmap(image.plt.getBitmap());
+                    String message = Double.toString(((double) (System.nanoTime() - t) / 1000000000)) + " s";
+                    timeView.setText(message);
+                    return true;
+                }
+            } else if (coord) {
+                int i = (int) event.getX();
+                int j = (int) event.getY();
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    image.plt.draw_soln(i, j, false, false);
+                    image.setImageBitmap(image.plt.getBitmap());
+                }
+                timeView.setText(image.plt.real_coords_string(i, j));
+            }
+            return false;
         }
-        return false;
+    };
+
+    public void selectZoom(View view) {
+
+        // set booleans so other methods know how to behave
+        image.setZoom(true);
+        solution = false;
+        coord = false;
+
+        // set appearance so user knows how the methods will behave
+        zoomButton.setBackgroundColor(0xFF303F9F);                  // Set to primary colour dark
+        solutionButton.setBackgroundColor(0xFF3F51B5);              // Set to primary colour light
+        coordButton.setBackgroundColor(0xFF3F51B5);                 // Set to primary colour light
+    }
+
+    public void selectSolution(View view) {
+
+        // set booleans so other methods know how to behave
+        image.setZoom(false);
+        solution = true;
+        coord = false;
+
+        // set appearance so user knows how the methods will behave
+        zoomButton.setBackgroundColor(0xFF3F51B5);                  // Set to primary colour light
+        solutionButton.setBackgroundColor(0xFF303F9F);              // Set to primary colour dark
+        coordButton.setBackgroundColor(0xFF3F51B5);                 // Set to primary colour light
+    }
+
+    public void selectCoord(View view) {
+
+        // set booleans so other methods know how to behave
+        image.setZoom(false);
+        solution = false;
+        coord = true;
+
+        // set appearance so user knows how the methods will behave
+        zoomButton.setBackgroundColor(0xFF3F51B5);                  // Set to primary colour light
+        solutionButton.setBackgroundColor(0xFF3F51B5);              // Set to primary colour light
+        coordButton.setBackgroundColor(0xFF303F9F);                 // Set to primary colour dark
     }
 }
