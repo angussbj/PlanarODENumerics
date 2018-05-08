@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:keyWidth="12.5%p"
+    android:keyHeight="8%p"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <Row>
+        <Key android:codes="40"    android:keyLabel="(" />
+        <Key android:codes="55"    android:keyLabel="7" />
+        <Key android:codes="56"    android:keyLabel="8" />
+        <Key android:codes="57"    android:keyLabel="9" />
+        <Key android:codes="47"    android:keyLabel="&#247;" />
+        <Key android:codes="18"    android:keyLabel="x" />
+        <Key android:codes="26"    android:keyLabel="&#8730;" />
+        <Key android:codes="-5"    android:keyLabel="DEL" />
+    </Row>
+    <Row>
+        <Key android:codes="41"    android:keyLabel=")" />
+        <Key android:codes="52"    android:keyLabel="4" />
+        <Key android:codes="53"    android:keyLabel="5" />
+        <Key android:codes="54"    android:keyLabel="6" />
+        <Key android:codes="42"    android:keyLabel="&#215;" />
+        <Key android:codes="19"    android:keyLabel="y" />
+        <Key android:codes="26"    android:keyLabel="\u03C0" />
+        <Key android:codes="55006" android:keyLabel="CLEAR" />
+    </Row>
+    <Row>
+        <Key android:codes="100"   android:keyLabel="f()" />
+        <Key android:codes="49"    android:keyLabel="1" />
+        <Key android:codes="50"    android:keyLabel="2" />
+        <Key android:codes="51"    android:keyLabel="3" />
+        <Key android:codes="45"    android:keyLabel="&#8722;" />
+        <Key android:codes="22"    android:keyLabel="sin" />
+        <Key android:codes="24"    android:keyLabel="tan" />
+    </Row>
+    <Row>
+        <Key android:codes="101"   android:keyLabel="Aa" />
+        <Key android:codes="48"    android:keyLabel="0" />
+        <Key android:codes="46"    android:keyLabel="." />
+        <Key android:codes="94"    android:keyLabel="^" />
+        <Key android:codes="43"    android:keyLabel="&#43;" />
+        <Key android:codes="23"    android:keyLabel="cos" />
+        <Key android:codes="25"    android:keyLabel="log" />
+        <Key android:codes="102"   android:keyLabel="DONE" />
+    </Row>
+</Keyboard>
