@@ -6,4 +6,501 @@
     android:layout_height="match_parent"
     tools:context=".HelpActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/help_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/android:actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ToolbarStyle" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_toolbar">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvLegalStuffHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Legal Stuff"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvLegalStuffPar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="This app is the intelectual property of Angus Johnson. It was developed by him in 2018 using Android Studio, advice from developer.android.com and stackoverflow.com, and makes use of a Help icon from materials.io. If I have unwittingly used anything I shouldn't have please let me know so I can rectify it ASAP. This project is open source, and the code can be found at github.com/angussbj/PlanarODENumerics."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLegalStuffHeading" />
+
+            <TextView
+                android:id="@+id/tvLegalStuffPar2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="While I do my best to ensure this app works correctly, I take no responsibility for any fault and disclaim all liability. DO NOT USE THIS APP TO STOP BAD THINGS HAPPENING."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLegalStuffPar1" />
+
+            <TextView
+                android:id="@+id/tvBugsHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Bugs and stuff"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLegalStuffPar2" />
+
+            <TextView
+                android:id="@+id/tvBugsPar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="If you notice any bugs, would like to suggest any features, or have any other feedback, please email me at planar.odes.app@gmail.com."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvBugsHeading" />
+
+            <TextView
+                android:id="@+id/tvInstructionsHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Instructions"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvBugsPar1" />
+
+            <TextView
+                android:id="@+id/tvOverviewHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Overview"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsHeading" />
+
+            <TextView
+                android:id="@+id/tvInstructionsOverviewPar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="This app plots vector fields and solutions curves of two dimensional ordinary differential equations. It also locates equilibria and describes the linearization of the ODE around the equilibrium."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvOverviewHeading" />
+
+            <TextView
+                android:id="@+id/tvInputsHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="The inputs"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsOverviewPar1" />
+
+            <TextView
+                android:id="@+id/tvInstructionsInputsPar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="On the home screen in the 'Plot inputs' section, the top two fields allow you to input the differential equation in terms of x and y. The required format is described below - if there is a mistake anywhere, that part of the equation will be evaluated as 0. The four fields below that allow you to set the bounds of the rectangular domain that you want to look at the graph on - the top and bottom values on the x and y axes. These should be constant expressions. They can depend on your parameters (described below), e, and/or pi."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInputsHeading" />
+
+            <TextView
+                android:id="@+id/tvInstructionsInputsPar2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="The next section of the home screen allows you to define parameters (constants) that you'd like to include in the equations. You can have up to 6 parameters, declaring the symbol (any string) on the left of the equals sign and the value on the right."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsInputsPar1" />
+
+            <TextView
+                android:id="@+id/tvInstructionsInputsPar3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="Below that on the home screen, the settings section allows you to adjust the size of the arrows drawn (measured in pixels), and the maximum lengths of the solution curves (forwards and backwards in time, measured in 1 to 4 pixel steps or in-simulation time). It also lets you decide whether the time-stepping process should continue when the solution curve leaves the screen in case it curves back into the plot area (the setting 'Calculate off-screen solutions')."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsInputsPar2" />
+
+            <TextView
+                android:id="@+id/tvInstructionsInputsPar4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="IF THE APP IS CRASHING WHILE PLOTTING CURVES, it's probably because of these settings. High numbers of steps to plot, and high values of in-simulation time to reach will slow things down; plotting off the screen will slow things down; and plotting until a certain in-simulation time is reached while going off the screen can make things impossibly slow. This is because the dx/dt and dy/dt can get very large, and when this happens the in-system time elapsed per step can be very low, so it takes a huge (and possibly infinite) number of steps to reach the end time you set. This is much less of a problem if you don't calculate off-screen solutions."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsInputsPar3" />
+
+            <TextView
+                android:id="@+id/tvInstructionsInputsPar5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="The final section of the home screen allows you to choose one of the prebuilt examples to look at."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsInputsPar4" />
+
+            <TextView
+                android:id="@+id/tvSyntaxHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Equation syntax"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsInputsPar5" />
+
+            <TextView
+                android:id="@+id/tvInstructionsSyntaxPar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="The following symbols are allowed:"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSyntaxHeading" />
+
+            <!-- Use this guideline to position columns of the list that follows-->
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="206dp"
+                android:layout_marginLeft="205dp"
+                android:layout_marginRight="206dp"
+                android:layout_marginStart="205dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintGuide_begin="169dp"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tvAddSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:text="+ addition"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsSyntaxPar1" />
+
+            <TextView
+                android:id="@+id/tvSubSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:text="- subtraction"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvAddSymbol" />
+
+            <TextView
+                android:id="@+id/tvMultSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:text="* multiplication"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSubSymbol" />
+
+            <TextView
+                android:id="@+id/tvDivSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="/ division"
+                app:layout_constraintStart_toStartOf="@+id/guideline"
+                app:layout_constraintTop_toTopOf="@+id/tvAddSymbol" />
+
+            <TextView
+                android:id="@+id/tvPowSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="^ exponentiation"
+                app:layout_constraintStart_toStartOf="@+id/guideline"
+                app:layout_constraintTop_toBottomOf="@+id/tvDivSymbol" />
+
+            <TextView
+                android:id="@+id/tvBracketsSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="( ) grouping"
+                app:layout_constraintStart_toStartOf="@+id/guideline"
+                app:layout_constraintTop_toBottomOf="@+id/tvPowSymbol" />
+
+            <TextView
+                android:id="@+id/tvInstructionsEquationsPar2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="as well as the functions: log (natural logarithm), sqrt, abs (absolute value), sin, cos, tan, asin (inverse sine), acos, atan, sec, cosec, cot, sinh, cosh and tanh. The constants e and pi are also recognised. If you need a logarithm with a different base, use the identity that the base a logarithm of x = log(x)/log(a)."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvMultSymbol" />
+
+            <TextView
+                android:id="@+id/tvInstructionsEquationsPar3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="The order of operations goes as follows: brackets are observed, then functions are applied to what follows them immediately, then exponents are applied (left associating), then multiplication and division done (left associating), and finally addition and subtraction are done. Spaces are ignored. Other symbols and incorrect syntax are evaluated as 0. At some stage I'll write it so an error message comes up."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsEquationsPar2" />
+
+            <TextView
+                android:id="@+id/tvInstructionsEquationsPar4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="For example:"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsEquationsPar3" />
+
+            <TextView
+                android:id="@+id/tvEquation1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:text="a / b * c ^ d ^ sin f"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsEquationsPar4" />
+
+            <TextView
+                android:id="@+id/tvInstructionsEquationsPar5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="is computed as"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvEquation1" />
+
+            <TextView
+                android:id="@+id/tvEquation2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:text="(a / b) * ((c ^ d) ^ (sin(f)))."
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsEquationsPar5" />
+
+            <TextView
+                android:id="@+id/tvTheGraphWindowHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="The graph window"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvEquation2" />
+
+            <TextView
+                android:id="@+id/tvInstructionsGraphPar1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="When you press 'GRAPH', you end up in the graph window. Here, there are three modes: zoom, solution, and equilibrium. To change mode, touch the word in the toolbar at the bottom."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTheGraphWindowHeading" />
+
+            <TextView
+                android:id="@+id/tvInstructionsGraphPar2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="In zoom mode, you are able to pinch and drag the graph, to zoom in and out and pan around the image. When you zoom or pan, the plot area is re-drawn, and the curves and equilibria you've drawn. I know this isn't ideal, but it's rather difficult to fix as the curves could take a long time to re-plot. I have been thinking about some alternatives to try so, this should get fixed eventually."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsGraphPar1" />
+
+            <TextView
+                android:id="@+id/tvInstructionsGraphPar3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="In the solution mode, touching the picture draws the solution curve to the ODE through the point you touched. The solution appears when you release your finger from the graph at the location you were last touching the graph. It may take a moment for the solution to appear depending on the device and settings you're using. To speed things up, you could decrease the max steps/time you're plotting, set either the forwards or backwards max time/steps to zero (if your device has only one processor), or turn off 'Calculate off-screen solutions'. However, if your maximum time/steps settings are too low, then the solution curve will end before it reaches a source, sink or the edge of the plot area. These settings are on the home page. After a curve has been drawn, the time it took to draw it appears in the top right of the screen."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsGraphPar2" />
+
+            <TextView
+                android:id="@+id/tvInstructionsGraphPar4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="In the equilibrium mode, tapping the plot area will use Newton's method to find a nearby equilibrium. If the equilibrium is in the plot area, a magenta square is drawn to mark its location. Whether or not it's in the plot area, the Jacobian at that point, the coordinates, and the type of equilibrium are shown at the top of the screen. Tapping on the Jacobian matrix reveals the eigenvalues and eigenvectors. If an equilibrium is not found with 20 iterations of Newton's method, the point reached will be plotted and its details shown anyway. This will be fixed soon."
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInstructionsGraphPar3" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+
 </android.support.constraint.ConstraintLayout>

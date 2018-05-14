@@ -2,7 +2,7 @@ package angus.planarodenumerics;
 
 import java.util.Arrays;
 
-public final class ATools {
+public final class AMath {
     /**
      * The base 2 logarithm function (slightly shitily implemented at the moment)
      *

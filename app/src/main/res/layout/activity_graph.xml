@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".GraphActivity">
 
+
+    <Button
+        android:id="@+id/eigenButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/background_light"
+        android:onClick="show_eigenstuff"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/graphView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
+
     <TextView
         android:id="@+id/dxdtView"
         android:layout_width="wrap_content"
@@ -13,11 +27,12 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="dxdt = "
+        android:text="dx/dt = "
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
 
     <TextView
         android:id="@+id/dydtView"
@@ -26,6 +41,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:text="dy/dt = "
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,35 +67,29 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+        android:background="?attr/android:colorPrimary"
+        android:minHeight="?attr/android:actionBarSize"
+        android:theme="?attr/android:actionBarTheme"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/solutionButton" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.50121653" />
 
     <Button
         android:id="@+id/solutionButton"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/android:colorPrimary"
         android:onClick="selectSolution"
-        android:text="SOLUTION"
+        android:textColor="@android:color/white"
+        android:text="Solution"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -93,15 +103,16 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/android:colorPrimary"
         android:onClick="selectZoom"
-        android:text="ZOOM"
+        android:textColor="@android:color/white"
+        android:text="Zoom/Pan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/solutionButton"
         app:layout_constraintStart_toStartOf="@+id/toolbar" />
 
     <Button
-        android:id="@+id/coordButton"
+        android:id="@+id/equilibriumButton"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -109,11 +120,153 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:background="?attr/colorPrimary"
-        android:onClick="selectCoord"
-        android:text="COORD"
+        android:background="?attr/android:colorPrimary"
+        android:onClick="selectEquilibrium"
+        android:textColor="@android:color/white"
+        android:text="Equilibrium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/toolbar"
         app:layout_constraintStart_toEndOf="@+id/solutionButton" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/graph_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/android:actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ToolbarStyle" />
+
+    <TextView
+        android:id="@+id/jacobainLeftBracketTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:text="("
+        android:textSize="36sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/dydtView"
+        app:layout_constraintStart_toEndOf="@+id/jEqualsTextView"
+        app:layout_constraintTop_toTopOf="@+id/dxdtView" />
+
+    <TextView
+        android:id="@+id/jEqualsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="J = "
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/dydtView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dxdtView" />
+
+    <TextView
+        android:id="@+id/jacobianRightBracketTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=")"
+        android:textSize="36sp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintTop_toTopOf="@+id/jacobainLeftBracketTextView" />
+
+    <TextView
+        android:id="@+id/equilibruimClassificaitonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeView" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/constraintLayout"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout">
+
+        <TextView
+            android:id="@+id/j22TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/j12TextView" />
+
+        <TextView
+            android:id="@+id/j12TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/jacobainLeftBracketTextView"
+        app:layout_constraintTop_toTopOf="@+id/dxdtView">
+
+        <TextView
+            android:id="@+id/j11TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/j21TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/j11TextView" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/eigenView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
+
+    <TextView
+        android:id="@+id/eigenView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dxdtView" />
 
 </android.support.constraint.ConstraintLayout>

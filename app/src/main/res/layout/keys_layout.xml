@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.inputmethodservice.KeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-
-</android.inputmethodservice.KeyboardView>
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:keyWidth="32px"
+    android:keyHeight="50px"
+    android:horizontalGap="2px"
+    android:verticalGap="2px"
+    android:layout_height="200px"
+    android:layout_width="match_parent">
+    <Row android:keyWidth="32px" >
+        <Key android:keyLabel="A" />
+    </Row>
+</Keyboard>

@@ -1,323 +1,825 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/dxdtEditText"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/AppTheme"
+        app:layout_constraintTop_toTopOf="parent"
+        app:theme="@style/ToolbarStyle" />
+
+    <angus.planarodenumerics.CustomKeyboardView
+        android:id="@+id/keyboardview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:visibility="gone"
+        android:keyBackground="@android:color/background_light"
+        android:background="@android:color/background_light"
+        android:keyTextColor="@android:color/black"
+        android:keyTextSize="35sp"
+        android:elevation="8dp"
+        android:shadowRadius="0.0"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
-        android:ems="10"
-        android:imeOptions="actionDone"
-        android:inputType="textPersonName"
-        android:singleLine="false"
-        android:text="2*x - y + 3*(x^2-y^2) + 2*x*y"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/keyboardview"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_toolbar"
+        app:layout_constraintVertical_bias="1.0">
 
-    <EditText
-        android:id="@+id/dydtEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:imeOptions="actionDone"
-        android:inputType="textPersonName"
-        android:text="x - 3*y - 3*(x^2-y^2) + 3*x*y"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/dxdtEditText" />
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/innerConstraintLayoutWithinScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="dx/dt ="
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/dxdtEditText"
-        app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/tMaxTextView"
+                android:layout_width="74dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:text="Max time forwards"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintStart_toEndOf="@+id/orTextView"
+                app:layout_constraintTop_toTopOf="@+id/maxPositiveStepsEditText" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="dy/dt ="
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/dydtEditText"
-        app:layout_constraintStart_toStartOf="parent" />
+            <EditText
+                android:id="@+id/maxPositiveTimeEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tMaxTextView"
+                app:layout_constraintTop_toTopOf="@+id/maxPositiveStepsEditText" />
+
+            <TextView
+                android:id="@+id/tMinTextView"
+                android:layout_width="74dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:text="Max time backwards"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintStart_toEndOf="@+id/orTextView1"
+                app:layout_constraintTop_toTopOf="@+id/maxNegativeStepsEditText" />
+
+            <EditText
+                android:id="@+id/maxNegativeTimeEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/tMinTextView"
+                app:layout_constraintTop_toBottomOf="@+id/maxPositiveStepsEditText" />
+
+            <EditText
+                android:id="@+id/parameter4SymbolEditText"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="d"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/parameter1SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter6ValueEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter6SymbolEditText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/parameter6EqualsTextView" />
+
+            <TextView
+                android:id="@+id/parameter6EqualsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter6SymbolEditText"
+                app:layout_constraintStart_toEndOf="@+id/parameter6SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter6SymbolEditText"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="g"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter4ValueEditText"
+                app:layout_constraintStart_toStartOf="@+id/guideline5" />
+
+            <EditText
+                android:id="@+id/parameter5ValueEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter5SymbolEditText"
+                app:layout_constraintEnd_toStartOf="@+id/guideline5"
+                app:layout_constraintStart_toEndOf="@+id/parameter5EqualsTextView" />
+
+            <TextView
+                android:id="@+id/parameter5EqualsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter5SymbolEditText"
+                app:layout_constraintStart_toEndOf="@+id/parameter5SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter5SymbolEditText"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="f"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter4SymbolEditText"
+                app:layout_constraintStart_toStartOf="@+id/guideline4" />
+
+            <EditText
+                android:id="@+id/parameter4ValueEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter4SymbolEditText"
+                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintStart_toEndOf="@+id/parameter4EqualsTextView" />
+
+            <TextView
+                android:id="@+id/parameter4EqualsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter4SymbolEditText"
+                app:layout_constraintStart_toEndOf="@+id/parameter4SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter2ValueEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter1SymbolEditText"
+                app:layout_constraintEnd_toStartOf="@+id/guideline5"
+                app:layout_constraintStart_toEndOf="@+id/parameter2EqualsTextView" />
+
+            <TextView
+                android:id="@+id/parameter2EqualsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter1SymbolEditText"
+                app:layout_constraintStart_toEndOf="@+id/parameter2SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter2SymbolEditText"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="b"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintTop_toBottomOf="@+id/parametersTitleTextView" />
+
+            <EditText
+                android:id="@+id/parameter3ValueEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter3SymbolEditText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/parameter3EqualsTextView" />
+
+            <TextView
+                android:id="@+id/parameter3EqualsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter1SymbolEditText"
+                app:layout_constraintStart_toEndOf="@+id/parameter3SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter3SymbolEditText"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="c"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintStart_toStartOf="@+id/guideline5"
+                app:layout_constraintTop_toBottomOf="@+id/parametersTitleTextView" />
+
+            <EditText
+                android:id="@+id/dydtEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="x - 3*y - 3*(x^2-y^2) + 3*x*y"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textView3"
+                app:layout_constraintTop_toBottomOf="@+id/dxdtEditText" />
+
+            <EditText
+                android:id="@+id/xminEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="-2"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/textViewxminLabel"
+                app:layout_constraintTop_toBottomOf="@+id/dydtEditText" />
+
+            <EditText
+                android:id="@+id/ymaxEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="3"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textViewymaxLabel"
+                app:layout_constraintTop_toBottomOf="@+id/xmaxEditText" />
+
+            <TextView
+                android:id="@+id/textViewArrowSizeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="Arrow size"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/arrowSizeEditText"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="dy/dt ="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/dydtEditText"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/stepsMaxTextView"
+                android:layout_width="74dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:text="Max steps forwards"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/maxPositiveStepsEditText" />
+
+            <TextView
+                android:id="@+id/stepsMinTextView"
+                android:layout_width="74dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:text="Max steps backwards"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/maxNegativeStepsEditText" />
+
+            <EditText
+                android:id="@+id/arrowSizeEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:text="60"
+                app:layout_constraintEnd_toStartOf="@+id/allowOffScreenSolutionCurvesSwitch"
+                app:layout_constraintStart_toEndOf="@+id/textViewArrowSizeLabel"
+                app:layout_constraintTop_toBottomOf="@+id/settingsTitleTextView" />
+
+            <TextView
+                android:id="@+id/settingsTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:text="Settings"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/parameter4ValueEditText" />
+
+            <TextView
+                android:id="@+id/plotInputsTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Plot inputs"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewxmaxLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="x_max = "
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/xmaxEditText"
+                app:layout_constraintStart_toStartOf="@+id/centreGuideLine" />
+
+            <TextView
+                android:id="@+id/textViewyminLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="y_min = "
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/yminEditText"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/xmaxEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="2"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textViewxmaxLabel"
+                app:layout_constraintTop_toBottomOf="@+id/dydtEditText" />
+
+            <EditText
+                android:id="@+id/dxdtEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:singleLine="false"
+                android:text="2*x - y + 3*(x^2-y^2) + 2*x*y"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textView2"
+                app:layout_constraintTop_toBottomOf="@+id/plotInputsTitleTextView" />
+
+            <EditText
+                android:id="@+id/yminEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="-3"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
+                app:layout_constraintStart_toEndOf="@+id/textViewyminLabel"
+                app:layout_constraintTop_toBottomOf="@+id/xminEditText" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/centreGuideLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="dx/dt ="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/dxdtEditText"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewxminLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="x_min = "
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/xminEditText"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewymaxLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="y_max = "
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/ymaxEditText"
+                app:layout_constraintStart_toStartOf="@+id/centreGuideLine" />
+
+            <Switch
+                android:id="@+id/allowOffScreenSolutionCurvesSwitch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:checked="false"
+                android:text="Calculate off-screen solutions"
+                app:layout_constraintBaseline_toBaselineOf="@+id/arrowSizeEditText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                tools:checked="false" />
+
+            <EditText
+                android:id="@+id/maxNegativeStepsEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:text="700"
+                app:layout_constraintEnd_toStartOf="@+id/orTextView1"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/stepsMinTextView"
+                app:layout_constraintTop_toBottomOf="@+id/maxPositiveStepsEditText" />
+
+            <EditText
+                android:id="@+id/maxPositiveStepsEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:text="700"
+                app:layout_constraintEnd_toStartOf="@+id/orTextView"
+                app:layout_constraintStart_toEndOf="@+id/stepsMaxTextView"
+                app:layout_constraintTop_toBottomOf="@+id/arrowSizeEditText" />
+
+            <TextView
+                android:id="@+id/parametersTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:text="Parameters"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/yminEditText" />
+
+            <EditText
+                android:id="@+id/parameter1SymbolEditText"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:text="a"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/parametersTitleTextView" />
+
+            <TextView
+                android:id="@+id/parameter1EqualsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="="
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter1SymbolEditText"
+                app:layout_constraintStart_toEndOf="@+id/parameter1SymbolEditText" />
+
+            <EditText
+                android:id="@+id/parameter1ValueEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="textPersonName"
+                android:textStyle="italic"
+                android:typeface="serif"
+                app:layout_constraintBaseline_toBaselineOf="@+id/parameter1SymbolEditText"
+                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintStart_toEndOf="@+id/parameter1EqualsTextView" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintGuide_percent="0.333"
+                app:layout_constraintHorizontal_bias="0.33"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="284dp"
+                app:layout_constraintGuide_percent="0.667" />
+
+            <TextView
+                android:id="@+id/examplesTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:text="Examples"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/maxNegativeStepsEditText" />
+
+            <Button
+                android:id="@+id/predatorPreyExampleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:onClick="examplePredatorPrey"
+                android:text="Predator-Prey"
+                app:layout_constraintEnd_toStartOf="@+id/guideline5"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintTop_toBottomOf="@+id/linearExampleButton" />
+
+            <Button
+                android:id="@+id/linearExampleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:onClick="exampleLinear"
+                android:text="Linear"
+                app:layout_constraintEnd_toStartOf="@+id/guideline5"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintTop_toTopOf="@+id/defaultsExampleButton" />
+
+            <Button
+                android:id="@+id/defaultsExampleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="restoreDefaults"
+                android:text="Defaults"
+                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/examplesTitleTextView" />
+
+            <Button
+                android:id="@+id/pendulumExampleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="examplePendulum"
+                android:text="Pendulum"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/defaultsExampleButton" />
+
+            <TextView
+                android:id="@+id/orTextView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:text="OR"
+                app:layout_constraintBottom_toBottomOf="@+id/maxNegativeStepsEditText"
+                app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
+                app:layout_constraintStart_toStartOf="@+id/centreGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/maxNegativeStepsEditText"
+                app:layout_constraintVertical_bias="0.64" />
+
+            <TextView
+                android:id="@+id/orTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:text="OR"
+                app:layout_constraintBottom_toBottomOf="@+id/maxPositiveStepsEditText"
+                app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
+                app:layout_constraintStart_toStartOf="@+id/centreGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/maxPositiveStepsEditText"
+                app:layout_constraintVertical_bias="0.99" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/graphButton"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginRight="24dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         android:onClick="graph"
         android:text="Graph"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/keyboardview"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/centreGuideLine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.50" />
-
-    <TextView
-        android:id="@+id/textViewxminLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="x_min = "
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/xminEditText"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/xminEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="numberSigned"
-        android:text="-2"
-        android:imeOptions="actionDone"
-        app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textViewxminLabel"
-        app:layout_constraintTop_toBottomOf="@+id/dydtEditText" />
-
-    <TextView
-        android:id="@+id/textViewxmaxLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:text="x_max = "
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/xmaxEditText"
-        app:layout_constraintStart_toStartOf="@+id/centreGuideLine" />
-
-    <EditText
-        android:id="@+id/xmaxEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:imeOptions="actionDone"
-        android:inputType="numberSigned"
-        android:text="2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textViewxmaxLabel"
-        app:layout_constraintTop_toBottomOf="@+id/dydtEditText" />
-
-    <EditText
-        android:id="@+id/yminEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="numberSigned"
-        android:text="-3"
-        android:imeOptions="actionDone"
-        app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
-        app:layout_constraintStart_toEndOf="@+id/textViewyminLabel"
-        app:layout_constraintTop_toBottomOf="@+id/xminEditText" />
-
-    <TextView
-        android:id="@+id/textViewyminLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="y_min = "
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/yminEditText"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/ymaxEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:imeOptions="actionDone"
-        android:inputType="numberSigned"
-        android:text="3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textViewymaxLabel"
-        app:layout_constraintTop_toBottomOf="@+id/xmaxEditText" />
-
-    <TextView
-        android:id="@+id/textViewymaxLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:text="y_max = "
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/ymaxEditText"
-        app:layout_constraintStart_toStartOf="@+id/centreGuideLine" />
-
     <Button
-        android:id="@+id/button"
+        android:id="@+id/focus_on_me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginStart="24dp"
-        android:onClick="restoreDefaults"
-        android:text="Defaults"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Plot inputs"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="275dp" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Settings"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
-
-    <TextView
-        android:id="@+id/textViewArrowSizeLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Arrow size"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/arrowSizeEditText"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/arrowSizeEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="60"
-        android:imeOptions="actionDone"
-        app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
-        app:layout_constraintStart_toEndOf="@+id/textViewArrowSizeLabel"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <EditText
-        android:id="@+id/maxStepsEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="700"
-        android:imeOptions="actionDone"
-        app:layout_constraintEnd_toStartOf="@+id/centreGuideLine"
-        app:layout_constraintStart_toStartOf="@+id/arrowSizeEditText"
-        app:layout_constraintTop_toBottomOf="@+id/arrowSizeEditText" />
-
-    <TextView
-        android:id="@+id/textViewMaxSteps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Max steps"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/maxStepsEditText"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Switch
-        android:id="@+id/plotForwardsSwitch"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:checked="true"
-        android:text="Plot forwards"
-        app:layout_constraintBaseline_toBaselineOf="@+id/arrowSizeEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/centreGuideLine"
-        tools:checked="true" />
-
-    <Switch
-        android:id="@+id/plotBackwardsSwitch"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:checked="true"
-        android:text="Plot backwards"
-        app:layout_constraintBaseline_toBaselineOf="@+id/maxStepsEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/centreGuideLine"
-        tools:checked="true" />
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
 
 </android.support.constraint.ConstraintLayout>

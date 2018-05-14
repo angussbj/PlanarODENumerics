@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
-    android:keyWidth="12.5%p"
+    android:keyWidth="10.9%p"
     android:keyHeight="8%p"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:horizontalGap="0%p">
 
     <Row>
-        <Key android:codes="40"    android:keyLabel="(" />
-        <Key android:codes="55"    android:keyLabel="7" />
-        <Key android:codes="56"    android:keyLabel="8" />
-        <Key android:codes="57"    android:keyLabel="9" />
-        <Key android:codes="47"    android:keyLabel="&#247;" />
-        <Key android:codes="18"    android:keyLabel="x" />
-        <Key android:codes="26"    android:keyLabel="&#8730;" />
-        <Key android:codes="-5"    android:keyLabel="DEL" />
-    </Row>
-    <Row>
-        <Key android:codes="41"    android:keyLabel=")" />
-        <Key android:codes="52"    android:keyLabel="4" />
-        <Key android:codes="53"    android:keyLabel="5" />
-        <Key android:codes="54"    android:keyLabel="6" />
+        <Key android:codes="1028"    android:keyLabel="&#8730;" android:horizontalGap="6%p" />
+        <Key android:codes="1026"  android:keyLabel="e" />
+        <Key android:codes="1027"  android:keyLabel="\u03C0" />
+        <Key android:codes="1029"    android:keyLabel="abs"/>
+        <Key android:codes="1016"  android:keyLabel="log" />
+        <Key android:codes="1010"  android:keyLabel="&#x1D465;" android:horizontalGap="4%p" />
         <Key android:codes="42"    android:keyLabel="&#215;" />
-        <Key android:codes="19"    android:keyLabel="y" />
-        <Key android:codes="26"    android:keyLabel="\u03C0" />
-        <Key android:codes="55006" android:keyLabel="CLEAR" />
+        <Key android:codes="1000"  android:keyLabel="\u232B" android:isRepeatable="true" />
     </Row>
     <Row>
-        <Key android:codes="100"   android:keyLabel="f()" />
-        <Key android:codes="49"    android:keyLabel="1" />
-        <Key android:codes="50"    android:keyLabel="2" />
-        <Key android:codes="51"    android:keyLabel="3" />
+        <Key android:codes="1013"  android:keyLabel="sin" android:horizontalGap="16.9%p" />
+        <Key android:codes="1017"  android:keyLabel="asin" />
+        <Key android:codes="1020"  android:keyLabel="sec" />
+        <Key android:codes="1023"  android:keyLabel="sinh" />
+        <Key android:codes="1011"  android:keyLabel="&#x1D466;" android:horizontalGap="4%p" />
+        <Key android:codes="47"    android:keyLabel="&#247;" />
+        <Key android:codes="1001"  android:keyLabel="CLR" />
+    </Row>
+    <Row>
+        <Key android:codes="1003"  android:keyLabel="123" android:horizontalGap="2%p"/>
+        <Key android:codes="1014"  android:keyLabel="cos" android:horizontalGap="4%p" />
+        <Key android:codes="1018"  android:keyLabel="acos" />
+        <Key android:codes="1021"  android:keyLabel="cosec" />
+        <Key android:codes="1024"  android:keyLabel="cosh" />
+        <Key android:codes="40"    android:keyLabel="(" android:horizontalGap="4%p" />
         <Key android:codes="45"    android:keyLabel="&#8722;" />
-        <Key android:codes="22"    android:keyLabel="sin" />
-        <Key android:codes="24"    android:keyLabel="tan" />
+        <Key android:codes="1030"  android:keyLabel="&#8592;" />
     </Row>
     <Row>
-        <Key android:codes="101"   android:keyLabel="Aa" />
-        <Key android:codes="48"    android:keyLabel="0" />
-        <Key android:codes="46"    android:keyLabel="." />
-        <Key android:codes="94"    android:keyLabel="^" />
+        <Key android:codes="1005"  android:keyLabel="Aa" android:horizontalGap="2%p"/>
+        <Key android:codes="1015"  android:keyLabel="tan" android:horizontalGap="4%p" />
+        <Key android:codes="1019"  android:keyLabel="atan" />
+        <Key android:codes="1022"  android:keyLabel="cot" />
+        <Key android:codes="1025"  android:keyLabel="tanh" />
+        <Key android:codes="41"    android:keyLabel=")" android:horizontalGap="4%p" />
         <Key android:codes="43"    android:keyLabel="&#43;" />
-        <Key android:codes="23"    android:keyLabel="cos" />
-        <Key android:codes="25"    android:keyLabel="log" />
-        <Key android:codes="102"   android:keyLabel="DONE" />
+        <Key android:codes="1002"  android:keyLabel="DONE" />
     </Row>
 </Keyboard>
