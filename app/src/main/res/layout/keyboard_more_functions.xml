@@ -14,7 +14,6 @@
         <Key android:codes="1016"  android:keyLabel="log" />
         <Key android:codes="1010"  android:keyLabel="&#x1D465;" android:horizontalGap="4%p" />
         <Key android:codes="42"    android:keyLabel="&#215;" />
-        <Key android:codes="1000"  android:keyLabel="\u232B" android:isRepeatable="true" />
     </Row>
     <Row>
         <Key android:codes="1013"  android:keyLabel="sin" android:horizontalGap="16.9%p" />
@@ -33,7 +32,7 @@
         <Key android:codes="1024"  android:keyLabel="cosh" />
         <Key android:codes="40"    android:keyLabel="(" android:horizontalGap="4%p" />
         <Key android:codes="45"    android:keyLabel="&#8722;" />
-        <Key android:codes="1030"  android:keyLabel="&#8592;" />
+        <Key android:codes="1000"   android:keyLabel="\u232B"       android:isRepeatable="true"                 />   <!-- delete -->
     </Row>
     <Row>
         <Key android:codes="1005"  android:keyLabel="Aa" android:horizontalGap="2%p"/>

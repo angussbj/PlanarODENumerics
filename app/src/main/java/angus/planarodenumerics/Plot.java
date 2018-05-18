@@ -4,13 +4,19 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
+import android.widget.Button;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Plot {
-    private int x_pixels;
+    public int x_pixels;
     public int y_pixels;
     private Bitmap bmp;
     private double x_scale;
@@ -21,15 +27,41 @@ public class Plot {
     double y_max;
     private String x_dot;
     private String y_dot;
-    private int[] pixels;
+    public int[] pixels;
     public int border;
     private double[] shortest_vector_drawn = new double[]{0, 0, Double.POSITIVE_INFINITY};
     private int arrow_size;
     private final Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-    String[] parameterSymbols;
-    double[] parameterValues;
-    double pixel_length;
-    double dt_max;
+    private String[] parameterSymbols;
+    private double[] parameterValues;
+    private double pixel_length;
+    private double dt_max;
+    AtomicInteger solutionThreadsRunning;
+    boolean keep_calculating;
+
+    public final int THREAD_DONE = 31415;
+
+    private ZoomableImageView plotView;
+    Button stopButton;
+
+    /**
+     * This handler deals with the message with message.what == THREAD_DONE by stopping displaying
+     * the stop button if the thread that just finished was the last drawing thread running. It is
+     * called by each time a drawing thread finishes.
+     */
+    Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message inputMessage) {
+            switch (inputMessage.what) {
+                case THREAD_DONE:
+                    if (solutionThreadsRunning.get() == 0) {
+                        stopButton.setVisibility(View.INVISIBLE);
+                    }
+                default:
+                    super.handleMessage(inputMessage);
+            }
+        }
+    };
 
     // TODO: Minimise uses of borders - make the only get plot function the one called by 'onDraw'.
 
@@ -60,7 +92,8 @@ public class Plot {
      *                      pairs of symbols and values have the same string index.
      */
     Plot(double xmn, double xmx, double ymn, double ymx, String xd, String yd, int xpx, int ypx,
-         int bdr, int arr_size, String[] paramSymbs, double[] paramVals) {
+         int bdr, int arr_size, String[] paramSymbs, double[] paramVals, ZoomableImageView v,
+         Button stop) {
         border = bdr;
         x_pixels = xpx - border;
         y_pixels = ypx - border;
@@ -79,6 +112,9 @@ public class Plot {
         parameterSymbols = paramSymbs;
         parameterValues = paramVals;
         pixel_length = real_coords(1, 0)[0] - real_coords(0,0)[0];
+        solutionThreadsRunning = new AtomicInteger(0);
+        plotView = v;
+        stopButton = stop;
     }
 
     /**
@@ -104,6 +140,7 @@ public class Plot {
         x_max = x_min + old_x_width / scaleFactor;
         y_max += Y / y_scale;
         y_min = y_max - old_y_height / scaleFactor;
+        pixel_length = real_coords(1, 0)[0] - real_coords(0,0)[0];
     }
 
     /**
@@ -410,13 +447,27 @@ public class Plot {
      */
     void draw_soln(int i, int j, boolean forwards_is_steps, boolean backwards_is_steps,
                    int max_steps_forwards, int max_steps_backwards, double max_t_forwards,
-                   double max_t_backwards, boolean solve_outside_plot_area) {
+                   double max_t_backwards, boolean solve_outside_plot_area, int jag) {
 
-        // Choose a random colour (that's not too dark)
+        if (solutionThreadsRunning.get() >= AUtil.getNumberOfCores() - 3 && solutionThreadsRunning.get() != 0) {
+            // We only want to do the code below if we won't use up all the cores to do so
+            // (but we'd better be able to still do some calculations if we only have 1 or 2 cores)
+            return;
+        }
+
+        // Allow calculations to happen
+        keep_calculating = true;
+
+        // Choose a random colour (that's not too dark, and not grey)
         Random rnd = new Random();
-        int r = 64 + rnd.nextInt(192);
-        int g = 64 + rnd.nextInt(192);
-        int b = 64 + rnd.nextInt(192);
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        while (r == g && g == b) {
+            r = 64 + rnd.nextInt(191);
+            g = 64 + rnd.nextInt(191);
+            b = 64 + rnd.nextInt(191);
+        }
         int col = Color.rgb(r, g, b);
         // Draw a box at the tap location
         for (int k = -2; k < 3; k++) {
@@ -432,41 +483,73 @@ public class Plot {
         double x = X[0];
         double y = X[1];
         if (forwards_is_steps) {
-            ft = drawingThread(x, y, col, max_steps_forwards, 0.125, solve_outside_plot_area);
+            ft = drawingThread(x, y, col, max_steps_forwards, 0.125, solve_outside_plot_area, jag);
+            solutionThreadsRunning.incrementAndGet();
             ft.start();
         } else {
-            ft = drawingThread(x, y, col, max_t_forwards, 0.125, solve_outside_plot_area);
+            ft = drawingThread(x, y, col, max_t_forwards, 0.125, solve_outside_plot_area, jag);
+            solutionThreadsRunning.incrementAndGet();
             ft.start();
         }
         if (backwards_is_steps) {
-            bt = drawingThread(x, y, col, max_steps_backwards, -0.125, solve_outside_plot_area);
+            bt = drawingThread(x, y, col, max_steps_backwards, -0.125, solve_outside_plot_area, jag);
+            solutionThreadsRunning.incrementAndGet();
             bt.start();
         } else {
-            bt = drawingThread(x, y, col, max_t_backwards, -0.125, solve_outside_plot_area);
+            bt = drawingThread(x, y, col, max_t_backwards, -0.125, solve_outside_plot_area, jag);
+            solutionThreadsRunning.incrementAndGet();
             bt.start();
         }
-        try {
-            ft.join();
-            bt.join();
-        } catch (InterruptedException e) {
-            System.err.println("Interrupted");
-        }
     }
 
+    /**
+     * This method creates a thread that will do the drawing of a solution curve for you. It is
+     * essentially an intermediary saying "give me all the variables that change all the time, and
+     * I need to know fresh, and I'll tell the thread about all the variables that are global in
+     * this plot object that it needs to know about". This just neatens the 'draw_soln' method.
+     *
+     * This is the version where the thread will run for a maximum number of steps.
+     *
+     * @param x             coordinate tapped
+     * @param y             coordinate tapped
+     * @param color         color to draw the curve in
+     * @param max_steps     cap on number of steps to calculate
+     * @param dt            initial time step (this essentially only determines direction in time)
+     * @param outside       whether or not to calculate values outside the plot area
+     * @param jag           max length allowed for a straight line section of the curve
+     * @return
+     */
     private Thread drawingThread(double x, double y, int color, int max_steps, double dt,
-                                 boolean outside) {
+                                 boolean outside, int jag) {
         DrawCurveToArray fwds = new DrawCurveToArray(x_dot, y_dot, x, y, dt,
                 pixel_length, x_min, x_max, y_min, y_max, color, this, parameterSymbols,
-                parameterValues, dt_max, max_steps, outside);
-        return new Thread(fwds);
+                parameterValues, dt_max, max_steps, outside, plotView, stopButton, jag);
+        return new Thread(fwds, "DrawingThread");
     }
 
+    /**
+     * This method creates a thread that will do the drawing of a solution curve for you. It is
+     * essentially an intermediary saying "give me all the variables that change all the time, and
+     * I need to know fresh, and I'll tell the thread about all the variables that are global in
+     * this plot object that it needs to know about". This just neatens the 'draw_soln' method.
+     *
+     * This is the version where the thread will run for a maximum amount of in-simulation time.
+     *
+     * @param x             coordinate tapped
+     * @param y             coordinate tapped
+     * @param color         color to draw the curve in
+     * @param max_time      cap on amount of in-simulation time to calculate a solution for
+     * @param dt            initial time step (this essentially only determines direction in time)
+     * @param outside       whether or not to calculate values outside the plot area
+     * @param jag           max length allowed for a straight line section of the curve
+     * @return
+     */
     private Thread drawingThread(double x, double y, int color, double max_time, double dt,
-                                 boolean outside) {
+                                 boolean outside, int jag) {
         DrawCurveToArray fwds = new DrawCurveToArray(x_dot, y_dot, x, y, dt,
                 pixel_length, x_min, x_max, y_min, y_max, color, this, parameterSymbols,
-                parameterValues, dt_max, max_time, outside);
-        return new Thread(fwds);
+                parameterValues, dt_max, max_time, outside, plotView, stopButton, jag);
+        return new Thread(fwds, "DrawingThread");
     }
 
     /**
@@ -502,16 +585,35 @@ public class Plot {
         }
     }
 
+    /**
+     * This method finds an equilibrium point (giving its (x, y) coordinates) near the (x, y)
+     * coordinates given.
+     *
+     * @param x     the x coordinate to look for an equilibrium point near
+     * @param y     the y coordinate to look for an equilibrium point near
+     * @return      the x and y cooridinates of an equilibrium point or [NaN, NaN] if one was not
+     *              found
+     */
     double[] find_equilibrium(double x, double y) {
         return find_equilibrium(pixel_coord_i(x), pixel_coord_j(y));
     }
 
+    /**
+     * This method finds an equilibrium point (giving its (x, y) coordinates) near the (i, j)
+     * pixel coordinates given (relative to the top left of the view).
+     *
+     * @param i     the i coordinate to look for an equilibrium point near
+     * @param j     the j coordinate to look for an equilibrium point near
+     * @return      the x and y cooridinates of an equilibrium point or [NaN, NaN] if one was not
+     *              found
+     */
     double[] find_equilibrium(int i, int j) {
         double delta_x = Double.POSITIVE_INFINITY;
         double delta_y = Double.POSITIVE_INFINITY;
         double[] coords = real_coords(i, j);
         double x = coords[0];
         double y = coords[1];
+        // TODO: Inefficiency when the x, y version of the method is used and we convert back and forth. Fix this by moving the main calculations into the other method and calling the other method from this one.
         double j11;
         double j12;
         double j21;
@@ -531,40 +633,119 @@ public class Plot {
             fy = Eval.eval(y_dot, x, y, parameterSymbols, parameterValues);
             detJ = j11 * j22 - j12 * j21;
             if (detJ == 0) {
-                // TODO: deal with this case more carefully
-                break;
+                // In this case we do Newton's method on vector length.
+                double dldx = dldx(x, y);
+                double dldy = dldy(x, y);
+                double direction_x = Math.abs(dldx / Math.sqrt(dldx * dldx + dldy * dldy));
+                double direction_y = Math.abs(dldy / Math.sqrt(dldx * dldx + dldy * dldy));
+                if (dldx + dldy == 0) {
+                    if (j11 == 0 && j12 == 0 && j21 == 0 && j22 == 0) {
+                        if (fx < pixel_length / 10000 && fy < pixel_length / 10000) {
+                            return new double[]{x, y};
+                        }
+                    }
+                    // If that still gives divide by zero problems, don't worry about it TODO: Maybe perturb things?
+                    return new double[]{Double.NaN, Double.NaN};
+                }
+                delta_x = - l(x, y) / (dldx + dldy)  *  direction_x;
+                delta_y = - l(x, y) / (dldx + dldy)  *  direction_y;
+            } else {
+                delta_x = -(j22 * fx - j12 * fy) / detJ;
+                delta_y = -(j11 * fy - j21 * fx) / detJ;
             }
-            delta_x = -(j22*fx - j12*fy) / detJ;
-            delta_y = -(j11*fy - j21*fx) / detJ;
             x += delta_x;
             y += delta_y;
             count += 1;
         }
+        if (delta_x > 2 * pixel_length || delta_y > 2 * pixel_length) {
+            return new double[]{Double.NaN, Double.NaN};
+        }
         return new double[]{x, y};
     }
 
+    /**
+     * This describes the equilibrium point given by its (x, y) coordinates by looking at its
+     * Jacobian (and in one special case looking at the flow at that point).
+     *
+     * @param x     The x coordinate of the equilibrium
+     * @param y     The y coordinate of the equilibrium
+     * @return      A string that describes the behaviour near the equilibrium
+     */
     String equilibrium_classification(double x, double y) {
         double j11 = ddx_x(x, y);
         double j22 = ddy_y(x, y);
         double det = j11 * j22 - ddy_x(x, y) * ddx_y(x, y);
-        if (det < 0) { return "saddle"; }
+        double zero_threshold = pixel_length / 1000;
+        if (det < - zero_threshold) { return "saddle"; }
         double tr = j11 + j22;
-        if (det == 0) {
-            if (tr > 0) { return "degenerate unstable equilibrium"; }
-            if (tr < 0) { return "degenerate stable equilibrium"; }
+        if (Math.abs(det) <= zero_threshold ) {
+            if (tr > zero_threshold) { return "degenerate unstable equilibrium"; }
+            if (tr < -zero_threshold) { return "degenerate stable equilibrium"; }
+            double fx = Eval.eval(x_dot, x, y, parameterSymbols, parameterValues);
+            double fy = Eval.eval(y_dot, x, y, parameterSymbols, parameterValues);
+            if (fx < zero_threshold && fy < zero_threshold) {
+                return "J \u2248 0";    // J approximately equal to 0
+            }
             return "degenerate parallel flow";
         }
-        if (tr > 0) {
-            if (det < (tr*tr / 4)) { return "unstable node"; }
-            if (det > (tr*tr / 4)) { return "unstable focus"; }
+        if (tr > zero_threshold) {
+            if (det - (tr*tr / 4) < -zero_threshold) { return "unstable node"; }
+            if (det - (tr*tr / 4) > zero_threshold) { return "unstable focus"; }
             return "unstable improper node"; // tr > 0, det = tr^2 / 4
         }
-        if (tr < 0) {
-            if (det < (tr*tr / 4)) { return "stable node"; }
-            if (det > (tr*tr / 4)) { return "stable focus"; }
+        if (tr < -zero_threshold) {
+            if (det - (tr*tr / 4) < -zero_threshold) { return "stable node"; }
+            if (det - (tr*tr / 4) > zero_threshold) { return "stable focus"; }
             return "stable improper node"; // tr < 0, det = tr^2 / 4
         }
         return "centre"; // tr == 0, det > 0
+    }
+
+    /**
+     * This method is used by the DrawCurveToArray runnable to determine whether the curve being
+     * drawn is going to end at an equilibrium point it is near or pass it by/circle it.
+     *
+     * @param x     The x coordinate of the equilibrium
+     * @param y     The y coordinate of the equilibrium
+     * @return      'true' if this is the kind of equilibrium where the curve would end, and 'false'
+     *              otherwise
+     */
+    boolean source_sink_or_zero(double x, double y) {
+        double j11 = ddx_x(x, y);
+        double j22 = ddy_y(x, y);
+        double det = j11 * j22 - ddy_x(x, y) * ddx_y(x, y);
+        double zero_threshold = pixel_length / 10000;
+        if (det < - zero_threshold) { return false; }
+        double tr = j11 + j22;
+        if (Math.abs(tr) <= zero_threshold ) {
+            double fx = Eval.eval(x_dot, x, y, parameterSymbols, parameterValues);
+            double fy = Eval.eval(y_dot, x, y, parameterSymbols, parameterValues);
+            if (fx < zero_threshold && fy < zero_threshold) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * These methods determine give the lengths and partial derivatives of length of the vectors
+     * (dx/dt, dy/dt) which are a function of x and y.
+     *
+     * @param x     x coordinate of the location we're interested in.
+     * @param y     x coordinate of the location we're interested in.
+     */
+    double l(double x, double y) {
+        return Math.sqrt(Math.pow(Eval.eval(x_dot, x , y, parameterSymbols, parameterValues), 2)
+                + Math.pow(Eval.eval(y_dot, x , y, parameterSymbols, parameterValues), 2));
+    }
+    double dldx(double x, double y) {
+        double h = pixel_length / 512;
+        return (l(x + h, y) - l(x, y)) / h;
+    }
+    double dldy(double x, double y) {
+        double h = pixel_length / 512;
+        return (l(x, y + h) - l(x, y)) / h;
     }
 
     /**
@@ -576,8 +757,7 @@ public class Plot {
      * The fifth method returns an array of these four values (in that order) written as strings to
      * the precision given.
      *
-     * The sixth method returns the determinant and is used by DrawCurveToArray to check whether
-     * it's approaching the kind of equilibrium it should stop at (a source or a sink - detJ >
+     * The sixth method returns the determinant.
      */
     double ddx_x(double x, double y) {
         double h = pixel_length / 512;
@@ -652,7 +832,6 @@ public class Plot {
                 y1 = new Complex(0);
                 x2 = new Complex(0);
                 y2 = new Complex(1);
-                System.out.println("A");
             } else {
                 // Set x2 as the zero vector to signify there is only one eigenvector
                 x2 = new Complex(0);
@@ -879,5 +1058,14 @@ public class Plot {
         int[] px = new int[(x_pixels + border) * (y_pixels + border)];
         for (int i = 0; i < px.length; i++) { px[i] = Color.BLACK; }
         return Bitmap.createBitmap(px, x_pixels + border, y_pixels + border, conf);
+    }
+
+    /**
+     * The keep_calculating variable is checked by DrawCurveToArray each loop to check whether it
+     * should continue looping. Calling this method will result in the calculating/drawing threads
+     * ending safely relatively soon.
+     */
+    public void stopCalculations() {
+        keep_calculating = false;
     }
 }

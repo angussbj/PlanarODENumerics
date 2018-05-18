@@ -14,6 +14,5 @@ public class HelpActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.help_toolbar));
         ActionBar ab =  getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        //textView.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
     }
 }

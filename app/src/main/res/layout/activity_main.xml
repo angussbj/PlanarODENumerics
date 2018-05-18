@@ -419,6 +419,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/maxNegativeStepsEditText" />
 
+            <TextView
+                android:id="@+id/jaggednessTextView"
+                android:layout_width="74dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:text="Sol'n curve jaggedness"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/maxNegativeStepsEditText" />
+
             <EditText
                 android:id="@+id/arrowSizeEditText"
                 android:layout_width="0dp"
@@ -611,6 +623,23 @@
                 app:layout_constraintTop_toBottomOf="@+id/maxPositiveStepsEditText" />
 
             <EditText
+                android:id="@+id/jaggednessEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:text="4"
+                app:layout_constraintEnd_toStartOf="@+id/orTextView1"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/stepsMinTextView"
+                app:layout_constraintTop_toBottomOf="@+id/maxNegativeStepsEditText" />
+
+            <EditText
                 android:id="@+id/maxPositiveStepsEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -712,22 +741,25 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/maxNegativeStepsEditText" />
+                app:layout_constraintTop_toBottomOf="@+id/jaggednessEditText" />
 
             <Button
                 android:id="@+id/predatorPreyExampleButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:onClick="examplePredatorPrey"
                 android:text="Predator-Prey"
-                app:layout_constraintEnd_toStartOf="@+id/guideline5"
-                app:layout_constraintStart_toStartOf="@+id/guideline4"
-                app:layout_constraintTop_toBottomOf="@+id/linearExampleButton" />
+                app:layout_constraintEnd_toStartOf="@+id/pendulumExampleButton"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/defaultsExampleButton" />
 
             <Button
                 android:id="@+id/linearExampleButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
@@ -735,41 +767,39 @@
                 android:layout_marginStart="8dp"
                 android:onClick="exampleLinear"
                 android:text="Linear"
-                app:layout_constraintEnd_toStartOf="@+id/guideline5"
-                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintEnd_toStartOf="@+id/examplePlaceholder2"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/defaultsExampleButton"
                 app:layout_constraintTop_toTopOf="@+id/defaultsExampleButton" />
 
             <Button
                 android:id="@+id/defaultsExampleButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:onClick="restoreDefaults"
                 android:text="Defaults"
-                app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                app:layout_constraintEnd_toStartOf="@+id/linearExampleButton"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/examplesTitleTextView" />
 
             <Button
                 android:id="@+id/pendulumExampleButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:onClick="examplePendulum"
                 android:text="Pendulum"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline4"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/defaultsExampleButton" />
+                app:layout_constraintEnd_toStartOf="@+id/examplePlaceholder1"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/predatorPreyExampleButton"
+                app:layout_constraintTop_toTopOf="@+id/predatorPreyExampleButton" />
 
             <TextView
                 android:id="@+id/orTextView1"
@@ -798,6 +828,32 @@
                 app:layout_constraintTop_toTopOf="@+id/maxPositiveStepsEditText"
                 app:layout_constraintVertical_bias="0.99" />
 
+            <Button
+                android:id="@+id/examplePlaceholder1"
+                android:layout_width="0dp"
+                android:layout_height="76dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:text="Button"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/pendulumExampleButton"
+                app:layout_constraintTop_toTopOf="@+id/predatorPreyExampleButton" />
+
+            <Button
+                android:id="@+id/examplePlaceholder2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:text="Button"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/linearExampleButton"
+                app:layout_constraintTop_toTopOf="@+id/defaultsExampleButton" />
+
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
@@ -821,5 +877,95 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"/>
+
+    <FrameLayout
+        android:id="@+id/errorScrimFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorErrorDarkTransparent"
+        android:elevation="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/white"
+                android:elevation="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="24dp"
+                        android:text="Please check inputs"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/colorErrorDark"
+                        android:textSize="24sp"
+                        app:fontFamily="sans-serif"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <Button
+                        android:id="@+id/button"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@android:color/white"
+                        android:onClick="hideError"
+                        android:text="OK"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/errorMessageTV" />
+
+                    <TextView
+                        android:id="@+id/errorMessageTV"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="13dp"
+                        android:textColor="@color/colorErrorLight"
+                        android:textSize="16sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+                </android.support.constraint.ConstraintLayout>
+            </FrameLayout>
+        </android.support.constraint.ConstraintLayout>
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

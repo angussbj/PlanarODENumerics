@@ -1,7 +1,10 @@
 package angus.planarodenumerics;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GraphActivity extends AppCompatActivity {
 
@@ -22,14 +27,13 @@ public class GraphActivity extends AppCompatActivity {
     double xmax;
     double ymin;
     double ymax;
+    int jag;
     int arrow_size;
     ZoomableImageView image;
-    boolean zoom;
     boolean solution;
     boolean equilibrium;
     String[] parameterSymbols;
     double[] parameterValues;
-    Button zoomButton;
     Button solutionButton;
     Button equilibriumButton;
     Button eigenButton;
@@ -46,6 +50,7 @@ public class GraphActivity extends AppCompatActivity {
     TextView classificationView;
     TextView eigenView1;
     TextView eigenView2;
+    TextView tapIntructionTV;
     boolean solve_outside_plot_area;
     boolean forwards_is_steps_not_time;
     boolean backwards_is_steps_not_time;
@@ -53,7 +58,8 @@ public class GraphActivity extends AppCompatActivity {
     double t_max_backwards;
     int steps_max_forwards;
     int steps_max_bakcwards;
-    Complex[] eigs;
+    Button stopCalcsButton;
+    Timer timer;
 
 
     @Override
@@ -67,11 +73,9 @@ public class GraphActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         // Set up the toolbar buttons
-        zoomButton = findViewById(R.id.zoomButton);
         solutionButton = findViewById(R.id.solutionButton);
         equilibriumButton = findViewById(R.id.equilibriumButton);
         solutionButton.setBackgroundColor(0xFF303F9F);              // Set to primary colour dark
-        zoom = false;
         solution = true;
         equilibrium = false;
 
@@ -90,6 +94,11 @@ public class GraphActivity extends AppCompatActivity {
         eigenButton = findViewById(R.id.eigenButton);
         eigenView1 = findViewById(R.id.eigenView1);
         eigenView2 = findViewById(R.id.eigenView2);
+        tapIntructionTV = findViewById(R.id.tapInstructionTV);
+
+        // Set up the stop calcs button
+        timer = new Timer();
+        stopCalcsButton = findViewById(R.id.stopButton);
 
         // Get the variables from the main activity
         Intent intent = getIntent();
@@ -102,6 +111,7 @@ public class GraphActivity extends AppCompatActivity {
         ymin = Eval.eval(intent.getStringExtra(MainActivity.EXTRA_YMIN_KEY), 0, 0, parameterSymbols, parameterValues);
         ymax = Eval.eval(intent.getStringExtra(MainActivity.EXTRA_YMAX_KEY), 0, 0, parameterSymbols, parameterValues);
         arrow_size = Integer.parseInt(intent.getStringExtra(MainActivity.EXTRA_ARROWSIZE_KEY));
+        jag = Integer.parseInt(intent.getStringExtra(MainActivity.EXTRA_JAG_KEY));
         solve_outside_plot_area = intent.getBooleanExtra(MainActivity.EXTRA_OUTSIDE_KEY, false);
         String t_max_f = intent.getStringExtra(MainActivity.EXTRA_TIMEMAX_KEY);
         String t_max_b = intent.getStringExtra(MainActivity.EXTRA_TIMEMIN_KEY);
@@ -120,30 +130,32 @@ public class GraphActivity extends AppCompatActivity {
         } else {
             t_max_backwards = Eval.eval(t_max_b, 0, 0, parameterSymbols, parameterValues);
             steps_max_bakcwards = 0;
-
         }
+
         // Write the equations up the top, so people know what graph they're looking at
         dxdtView.setText("dx/dt = " + dxdt);
         dydtView.setText("dy/dt = " + dydt);
 
         // Find the view we'll show the graph in
         image = findViewById(R.id.graphView);
-        //image.setOnTouchListener(onTouchListener);
+        image.setOnTouchListener(onTouchListener);
 
         // Give the graph view the info it needs to draw solutions
         image.setSolutionDrawingVariables(forwards_is_steps_not_time,
                 backwards_is_steps_not_time, steps_max_forwards, steps_max_bakcwards,
-                t_max_forwards, t_max_backwards, solve_outside_plot_area);
+                t_max_forwards, t_max_backwards, solve_outside_plot_area, jag);
         image.setSolutions(true);
 
         // Give the graph view access to the text views
         image.setViews(eigenButton, timeView, dxdtView, dydtView, jEqualsView, leftBracketView,
                 rightBracketView, j11View, j12View, j21View, j22View, classificationView,
-                eigenView1, eigenView2);
+                eigenView1, eigenView2, tapIntructionTV);
     }
 
-    // This also happens when the activity is created, but later than onCreate, so we can work out
-    // the dimensions of the image view
+    /**
+     * This also happens when the activity is created, but later than onCreate, so we can work out
+     * the dimensions of the image view.
+     */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -155,71 +167,41 @@ public class GraphActivity extends AppCompatActivity {
             // Create Plot object for plot and use it
             image.setPlot(new Plot(xmin, xmax, ymin, ymax, dxdt.replace(" ", ""),
                     dydt.replace(" ", ""), w, h, 80, arrow_size,
-                    parameterSymbols, parameterValues));
+                    parameterSymbols, parameterValues, image, stopCalcsButton));
             image.plt.draw_vector_field();
             image.redraw_plot_area();
         }
     }
 
-    private void update_text_views() {
-        timeView.setText(image.timeString);
-        j11View.setText(image.jStrings[0]);
-        j12View.setText(image.jStrings[1]);
-        j21View.setText(image.jStrings[2]);
-        j22View.setText(image.jStrings[3]);
-        classificationView.setText(image.classificationString);
-        eigenView1.setText(image.e1String);
-        eigenView2.setText(image.e2String);
-        if (image.tVisible) {
-            timeView.setVisibility(View.VISIBLE);
-        } else {
-            timeView.setVisibility(View.INVISIBLE);
+    /**
+     * This listener shows the stop button if the app has been calculating solution curves for 0.8
+     * seconds, so the user can stop the calculations if they're taking too long.
+     */
+    View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int action = event.getAction();
+            if (action == MotionEvent.ACTION_UP) {
+                stopCalcsButton.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (image.plt.solutionThreadsRunning.get() > 0) {
+                            showStopButton();
+                        }
+                    }
+                }, 800);
+            }
+            return false;
         }
-        if (image.dxdtVisible) {
-            dxdtView.setVisibility(View.VISIBLE);
-            dydtView.setVisibility(View.VISIBLE);
-        } else {
-            dxdtView.setVisibility(View.INVISIBLE);
-            dydtView.setVisibility(View.INVISIBLE);
-        }
-        if (image.jVisible) {
-            jEqualsView.setVisibility(View.VISIBLE);
-            leftBracketView.setVisibility(View.VISIBLE);
-            rightBracketView.setVisibility(View.VISIBLE);
-            j11View.setVisibility(View.VISIBLE);
-            j12View.setVisibility(View.VISIBLE);
-            j21View.setVisibility(View.VISIBLE);
-            j22View.setVisibility(View.VISIBLE);
-        } else {
-            jEqualsView.setVisibility(View.INVISIBLE);
-            leftBracketView.setVisibility(View.INVISIBLE);
-            rightBracketView.setVisibility(View.INVISIBLE);
-            j11View.setVisibility(View.INVISIBLE);
-            j12View.setVisibility(View.INVISIBLE);
-            j21View.setVisibility(View.INVISIBLE);
-            j22View.setVisibility(View.INVISIBLE);
-        }
-        if (image.cVisible) {
-            classificationView.setVisibility(View.VISIBLE);
-        } else {
-            classificationView.setVisibility(View.INVISIBLE);
-        }
-        if (image.eVisible) {
-            eigenView1.setVisibility(View.VISIBLE);
-            eigenView2.setVisibility(View.VISIBLE);
-        } else {
-            eigenView1.setVisibility(View.INVISIBLE);
-            eigenView2.setVisibility(View.INVISIBLE);
-        }
-        if (image.ebVisible) {
-            eigenButton.setVisibility(View.VISIBLE);
-        } else {
-            eigenButton.setVisibility(View.INVISIBLE);
-        }
-    }
+    };
 
+    /**
+     * This method shows the view where eigenvalues and eigenvectors are displayed and hides the
+     * views that overlap with them.
+     *
+     * @param view      The button that was pressed to call this
+     */
     public void show_eigenstuff(View view) {
-        System.out.println();
         if (eigenView1.getVisibility() == View.VISIBLE) {
             timeView.setVisibility(View.VISIBLE);
             j11View.setVisibility(View.VISIBLE);
@@ -232,7 +214,7 @@ public class GraphActivity extends AppCompatActivity {
             classificationView.setVisibility(View.VISIBLE);
             eigenView1.setVisibility(View.INVISIBLE);
             eigenView2.setVisibility(View.INVISIBLE);
-        } else {
+        } else if (jEqualsView.getVisibility() == View.VISIBLE){
             timeView.setVisibility(View.INVISIBLE);
             j11View.setVisibility(View.INVISIBLE);
             j12View.setVisibility(View.INVISIBLE);
@@ -242,61 +224,70 @@ public class GraphActivity extends AppCompatActivity {
             rightBracketView.setVisibility(View.INVISIBLE);
             jEqualsView.setVisibility(View.INVISIBLE);
             classificationView.setVisibility(View.INVISIBLE);
+            tapIntructionTV.setVisibility(View.INVISIBLE);
             eigenView1.setVisibility(View.VISIBLE);
             eigenView2.setVisibility(View.VISIBLE);
         }
+
     }
 
-    public void selectZoom(View view) {
-
-        // set booleans so other methods know how to behave
-        image.setZoom(true);
-        image.setSolutions(false);
-        image.setEquilibria(false);
-
-        // set appearance so user knows how the methods will behave
-        zoomButton.setBackgroundColor(0xFF303F9F);                  // Set to primary colour dark
-        solutionButton.setBackgroundColor(0xFF3F51B5);              // Set to primary colour light
-        equilibriumButton.setBackgroundColor(0xFF3F51B5);           // Set to primary colour light
-
-        image.tVisible = true;
-        image.jVisible = false;
-        image.cVisible = false;
-        image.ebVisible = false;
-        image.eVisible = false;
-        image.dxdtVisible = true;
-        update_text_views();
-    }
+    /**
+     * The next two methods change the app between solution curve plotting mode and equilibrium
+     * point finding mode.
+     */
     public void selectSolution(View view) {
 
         // set booleans so other methods know how to behave
-        image.setZoom(false);
         image.setSolutions(true);
         image.setEquilibria(false);
 
         // set appearance so user knows how the methods will behave
-        zoomButton.setBackgroundColor(0xFF3F51B5);                  // Set to primary colour light
         solutionButton.setBackgroundColor(0xFF303F9F);              // Set to primary colour dark
         equilibriumButton.setBackgroundColor(0xFF3F51B5);           // Set to primary colour light
 
-        image.tVisible = true;
-        image.jVisible = false;
-        image.cVisible = false;
-        image.ebVisible = false;
-        image.eVisible = false;
-        image.dxdtVisible = true;
-        update_text_views();
+        timeView.setVisibility(View.VISIBLE);
+        dxdtView.setVisibility(View.VISIBLE);
+        dydtView.setVisibility(View.VISIBLE);
+        j11View.setVisibility(View.INVISIBLE);
+        j12View.setVisibility(View.INVISIBLE);
+        j21View.setVisibility(View.INVISIBLE);
+        j22View.setVisibility(View.INVISIBLE);
+        leftBracketView.setVisibility(View.INVISIBLE);
+        rightBracketView.setVisibility(View.INVISIBLE);
+        jEqualsView.setVisibility(View.INVISIBLE);
+        classificationView.setVisibility(View.INVISIBLE);
+        eigenButton.setVisibility(View.GONE);
+        tapIntructionTV.setVisibility(View.GONE);
+        eigenView1.setVisibility(View.INVISIBLE);
+        eigenView2.setVisibility(View.INVISIBLE);
+        timeView.setText("");
     }
     public void selectEquilibrium(View view) {
 
         // set booleans so other methods know how to behave
-        image.setZoom(false);
         image.setSolutions(false);
         image.setEquilibria(true);
 
         // set appearance so user knows how the methods will behave
-        zoomButton.setBackgroundColor(0xFF3F51B5);                  // Set to primary colour light
         solutionButton.setBackgroundColor(0xFF3F51B5);              // Set to primary colour light
         equilibriumButton.setBackgroundColor(0xFF303F9F);           // Set to primary colour dark
+    }
+
+    /**
+     * This method changes a variable that results in any running calculating/drawing threads
+     * stopping soon.
+     *
+     * @param view  The button that was pressed
+     */
+    public void stopCalculations(View view) {
+        image.plt.stopCalculations();
+        stopCalcsButton.setVisibility(View.GONE);
+    }
+
+    /**
+     * This method makes the stop button appear.
+     */
+    public void showStopButton() {
+        stopCalcsButton.setVisibility(View.VISIBLE);
     }
 }

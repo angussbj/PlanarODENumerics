@@ -1,5 +1,6 @@
 package angus.planarodenumerics;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,9 +19,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_TIMEMAX_KEY = "angus.planarodenumerics.EXTRA_TIMEMAX";
     public static final String EXTRA_TIMEMIN_KEY = "angus.planarodenumerics.EXTRA_TIMEMIN";
     public static final String EXTRA_OUTSIDE_KEY = "angus.planarodenumerics.EXTRA_OUTSIDE";
+    public static final String EXTRA_JAG_KEY = "angus.planarodenumerics.EXTRA_JAG";
 
     public static final String PREF_DXDT_KEY = "angus.planarodenumerics.PREF_DXDT";
     public static final String PREF_DYDT_KEY = "angus.planarodenumerics.PREF_DYDT";
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREF_TIMEMAX_KEY = "angus.planarodenumerics.PREF_TIMEMAX";
     public static final String PREF_TIMEMIN_KEY = "angus.planarodenumerics.PREF_TIMEMIN";
     public static final String PREF_OUTSIDE_KEY = "angus.planarodenumerics.PREF_OUTSIDE";
+    public static final String PREF_JAG_KEY = "angus.planarodenumerics.PREF_JAG";
 
     EditText dxdtEditText;
     EditText dydtEditText;
@@ -87,12 +93,19 @@ public class MainActivity extends AppCompatActivity {
     EditText stepMinET;
     EditText timeMaxET;
     EditText timeMinET;
+    EditText jagET;
     Switch   outsideSw;
-    KeyboardView keyboardView;
     CustomKeyboard k_eqn_xyab;
     CustomKeyboard k_int;
     CustomKeyboard k_abc;
+    Button   graphButton;
+    View errorView;
+    TextView errorMessageTV;
 
+    /**
+     * This method identifies all the input fields for use in other methods, and tells them each
+     * what keyboard they get to use (as well as setting up the keyboards).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +136,10 @@ public class MainActivity extends AppCompatActivity {
         stepMinET = findViewById(R.id.maxNegativeStepsEditText);
         timeMaxET = findViewById(R.id.maxPositiveTimeEditText);
         timeMinET = findViewById(R.id.maxNegativeTimeEditText);
+        jagET = findViewById(R.id.jaggednessEditText);
         outsideSw = findViewById(R.id.allowOffScreenSolutionCurvesSwitch);
+        errorView = findViewById(R.id.errorScrimFrame);
+        errorMessageTV = findViewById(R.id.errorMessageTV);
 
         // Set up the keyboards for different types of input field
         k_eqn_xyab = new CustomKeyboard(this, R.id.keyboardview, R.layout.keyboard);
@@ -148,12 +164,17 @@ public class MainActivity extends AppCompatActivity {
         k_eqn_xyab.registerEditText(param5ValueET);
         k_eqn_xyab.registerEditText(param6ValueET);
         k_int.registerEditText(arrowSizeEditText);
+        k_int.registerEditText(jagET);
         k_int.registerEditText(stepMaxET, timeMaxET);    //   The second argument is the edit text
         k_int.registerEditText(stepMinET, timeMinET);    // with which this edit text is mutually
         k_eqn_xyab.registerEditText(timeMaxET, stepMaxET); // exclusive.
         k_eqn_xyab.registerEditText(timeMinET, stepMinET); // (here too)
     }
 
+    /**
+     * This method restores all the text in the input fields from the saved state, and hides the
+     * keyboard.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -183,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
         String stepMin = sharedPref.getString(PREF_STEPMIN_KEY, "700");
         String timeMax = sharedPref.getString(PREF_TIMEMAX_KEY, "");
         String timeMin = sharedPref.getString(PREF_TIMEMIN_KEY, "");
+        String jag = sharedPref.getString(PREF_JAG_KEY, "4");
         Boolean outside = sharedPref.getBoolean(PREF_OUTSIDE_KEY, false);
 
         // Set the values
@@ -209,11 +231,16 @@ public class MainActivity extends AppCompatActivity {
         stepMinET.setText(stepMin);
         timeMaxET.setText(timeMax);
         timeMinET.setText(timeMin);
+        jagET.setText(jag);
         outsideSw.setChecked(outside);
 
+        // Hide the keyboard by moving focus to the random button that has no other purpose
         findViewById(R.id.focus_on_me).requestFocus();
     }
 
+    /**
+     * This method saves all the text in the input fields when the activity is paused
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -242,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         String stepMin = stepMinET.getText().toString();
         String timeMax = timeMaxET.getText().toString();
         String timeMin = timeMinET.getText().toString();
+        String jag = jagET.getText().toString();
         Boolean outside = outsideSw.isChecked();
 
         // Store these values for when we come back to this activity (they'll be used by onStart)
@@ -270,10 +298,14 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(PREF_STEPMIN_KEY, stepMin);
         editor.putString(PREF_TIMEMAX_KEY, timeMax);
         editor.putString(PREF_TIMEMIN_KEY, timeMin);
+        editor.putString(PREF_JAG_KEY, jag);
         editor.putBoolean(PREF_OUTSIDE_KEY, outside);
         editor.commit();
     }
 
+    /**
+     * This method creates the options menu - ie makes the help icon appear.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // This sets up the options on the app bar - the only option being the 'help' section
@@ -282,6 +314,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * This method defines the behaviour of the help icon - opening the help activity.
+     *
+     * @param item  The menu item we're defining the behaviour of - currently there's only one in
+     *              this activity
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // This opens the help menu when the only option item - the help option item - is selected
@@ -289,8 +327,27 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * This method checks for errors in the input fields, then if everything looks good, it makes
+     * the graph activity appear, and passes it all the necessary information to show the graph and
+     * do all the cool stuff it does.
+     */
     public void graph(View view) {
-        System.out.println("graphing?");
+
+        // Check that either steps and time aren't being used together for the same direction
+        if (stepMaxET.hasFocus() && !stepMaxET.getText().equals("")) {
+            timeMaxET.setText("");
+        }
+        if (stepMinET.hasFocus() && !stepMinET.getText().equals("")) {
+            timeMinET.setText("");
+        }
+        if (timeMaxET.hasFocus() && !timeMaxET.getText().equals("")) {
+            stepMaxET.setText("");
+        }
+        if (timeMinET.hasFocus() && !timeMinET.getText().equals("")) {
+            stepMinET.setText("");
+        }
+
         // Get strings (or booleans) from each input field
         String dxdt = dxdtEditText.getText().toString();
         String dydt = dydtEditText.getText().toString();
@@ -315,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
         String stepMin = stepMinET.getText().toString();
         String timeMax = timeMaxET.getText().toString();
         String timeMin = timeMinET.getText().toString();
+        String jag = jagET.getText().toString();
         Boolean outside = outsideSw.isChecked();
 
         // Create intent that will be used below to start the GraphActivity activity
@@ -326,6 +384,83 @@ public class MainActivity extends AppCompatActivity {
         double[] parameterValues = new double[]{Eval.eval(param1Value), Eval.eval(param2Value),
                 Eval.eval(param3Value), Eval.eval(param4Value), Eval.eval(param5Value),
                 Eval.eval(param6Value)};
+
+        // Check for matched brackets in all text fields
+        ArrayList<String> bfields = new ArrayList<String>(); // fields where brackets are mismatched
+        if (!checkBrackets(dxdt)) { bfields.add("dx/dt"); }
+        if (!checkBrackets(dydt)) { bfields.add("dy/dt"); }
+        if (!checkBrackets(xmin)) { bfields.add("x_min"); }
+        if (!checkBrackets(xmax)) { bfields.add("x_max"); }
+        if (!checkBrackets(ymin)) { bfields.add("y_min"); }
+        if (!checkBrackets(ymax)) { bfields.add("y_max"); }
+        if (!checkBrackets(param1Value)) { bfields.add("parameter " + param1Symbol); }
+        if (!checkBrackets(param2Value)) { bfields.add("parameter " + param2Symbol); }
+        if (!checkBrackets(param3Value)) { bfields.add("parameter " + param3Symbol); }
+        if (!checkBrackets(param4Value)) { bfields.add("parameter " + param4Symbol); }
+        if (!checkBrackets(param5Value)) { bfields.add("parameter " + param5Symbol); }
+        if (!checkBrackets(param6Value)) { bfields.add("parameter " + param6Symbol); }
+        if (!checkBrackets(timeMax)) { bfields.add("the forwards time field"); }
+        if (!checkBrackets(timeMin)) { bfields.add("the backwards time field"); }
+        String[] bracket_mismatched_fields = bfields.toArray(new String[0]);
+
+        if (bracket_mismatched_fields.length != 0) {
+            String message = "There are mismatched brackets in ";
+            message += toNaturalString(bracket_mismatched_fields);
+            errorMessageTV.setText(message);
+            showError();
+            return;
+        }
+
+        // The following will only run if all brackets are paired correctly
+
+        // Check that Eval.eval can parse the strings
+        String unparsed = "";
+        String u;
+        u = toNaturalString(Eval.evalTest(dxdt, parameterSymbols).toArray(new String[0]));
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "dx/dt"; }
+        u = toNaturalString(Eval.evalTest(dydt, parameterSymbols).toArray(new String[0]));
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "dy/dt"; }
+        u = toNaturalString(Eval.evalTest(xmin, parameterSymbols).toArray(new String[0]));
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "x_min"; }
+        u = toNaturalString(Eval.evalTest(xmax, parameterSymbols).toArray(new String[0]));
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "x_max"; }
+        u = toNaturalString(Eval.evalTest(ymin, parameterSymbols).toArray(new String[0]));
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "y_min"; }
+        u = toNaturalString(Eval.evalTest(ymax, parameterSymbols).toArray(new String[0]));
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "y_max"; }
+        if (param1Value.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(param1Value).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "parameter " + param1Symbol; }
+        if (param2Value.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(param2Value).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "parameter " + param2Symbol; }
+        if (param3Value.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(param3Value).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "parameter " + param3Symbol; }
+        if (param4Value.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(param4Value).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "parameter " + param4Symbol; }
+        if (param5Value.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(param5Value).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "parameter " + param5Symbol; }
+        if (param6Value.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(param6Value).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "parameter " + param6Symbol; }
+        if (timeMax.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(timeMax).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "the forwards time field"; }
+        if (timeMin.equals("")) { u = ""; } else { u = toNaturalString(Eval.evalTest(timeMin).toArray(new String[0])); }
+        if (!u.equals("")) {unparsed += "\n - " + u + " in " + "the forwards time field"; }
+        // (The integer cases)
+        if (arrow_size.equals("")) { u = ""; } else { try { Integer.parseInt(arrow_size); u = ""; } catch (NumberFormatException e) {u = arrow_size; } }
+        if (!u.equals("")) {unparsed += "\n - " + u + "in " + "the arrow size field (this should be an integer)"; }
+        if (stepMax.equals("")) { u = ""; } else { try { Integer.parseInt(stepMax); u = ""; } catch (NumberFormatException e) {u = stepMax; } }
+        if (!u.equals("")) {unparsed += "\n - " + u + "in " + "the forwards steps field (this should be an integer)"; }
+        if (stepMin.equals("")) { u = ""; } else { try { Integer.parseInt(stepMin); u = ""; } catch (NumberFormatException e) {u = stepMin; } }
+        if (!u.equals("")) {unparsed += "\n - " + u + "in " + "the backwards steps field (this should be an integer)"; }
+        if (stepMin.equals("")) { u = ""; } else { try { Integer.parseInt(jag); u = ""; } catch (NumberFormatException e) {u = jag; } }
+        if (!u.equals("")) {unparsed += "\n - " + u + "in " + "the jaggedness field (this should be an integer)"; }
+
+        if (unparsed.length() != 0) {
+            errorMessageTV.setText("The following expressions were not understood:" + unparsed);
+            showError();
+            return;
+        }
+
+        // The following will only run if all input syntax makes sense
 
         // Add these strings (and booleans) to the intent as extras
         intent.putExtra(EXTRA_DXDT_KEY, dxdt);
@@ -341,6 +476,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_STEPMIN_KEY, stepMin);
         intent.putExtra(EXTRA_TIMEMAX_KEY, timeMax);
         intent.putExtra(EXTRA_TIMEMIN_KEY, timeMin);
+        intent.putExtra(EXTRA_JAG_KEY, jag);
         intent.putExtra(EXTRA_OUTSIDE_KEY, outside);
 
         // Start the GraphActivity activity
@@ -374,6 +510,7 @@ public class MainActivity extends AppCompatActivity {
         stepMinET.setText("700");
         timeMaxET.setText("");
         timeMinET.setText("");
+        jagET.setText("4");
         outsideSw.setChecked(false);
     }
     public void examplePendulum(View view) {
@@ -405,27 +542,27 @@ public class MainActivity extends AppCompatActivity {
     }
     public void examplePredatorPrey(View view) {
         // Set the values
-        dxdtEditText.setText("a*x - b*x*y");
-        dydtEditText.setText("c*x*y - d*y");
+        dxdtEditText.setText("x*(1 - x) - a*x*y/(x + c)");
+        dydtEditText.setText("b*y*(1 - y/x)");
         xminEditText.setText("0");
-        xmaxEditText.setText("3");
+        xmaxEditText.setText("1");
         yminEditText.setText("0");
-        ymaxEditText.setText("3");
+        ymaxEditText.setText("2/3");
         param1SymbolET.setText("a");
         param2SymbolET.setText("b");
         param3SymbolET.setText("c");
-        param4SymbolET.setText("d");
+        param4SymbolET.setText("");
         param5SymbolET.setText("");
         param6SymbolET.setText("");
-        param1ValueET.setText("2/3");
-        param2ValueET.setText("4/3");
-        param3ValueET.setText("1");
-        param4ValueET.setText("1");
+        param1ValueET.setText("1");
+        param2ValueET.setText("0.2");
+        param3ValueET.setText("0.05");
+        param4ValueET.setText("");
         param5ValueET.setText("");
         param6ValueET.setText("");
         arrowSizeEditText.setText("60");
-        stepMaxET.setText("1400");
-        stepMinET.setText("1400");
+        stepMaxET.setText("1000");
+        stepMinET.setText("0");
         timeMaxET.setText("");
         timeMinET.setText("");
         outsideSw.setChecked(false);
@@ -457,6 +594,116 @@ public class MainActivity extends AppCompatActivity {
         timeMinET.setText("");
         outsideSw.setChecked(false);
     }
-}
 
-// TODO: Export figure options
+    /**
+     * This method takes an array of strings and returns a string formatted as is natural to english
+     * with no brackets, commas between elements, an and before the final element if there are two
+     * or more elements and the oxford comma if there are three or more elements
+     *
+     * @param a     A list of strings that would make sense if listed in english with comma
+     *              separation
+     * @return      A natural english listing of the strings
+     */
+    private String toNaturalString(String[] a){
+        if (a.length == 0) { return ""; }
+        if (a.length == 1) { return a[0]; }
+        if (a.length == 2) { return a[0] + " and " + a[1]; }
+        String output = "";
+        for (int i = 0; i < a.length - 1; i++) {
+            output += a[i] + ", ";
+        }
+        output += "and " + a[a.length - 1];
+        return output;
+    }
+
+    /**
+     * This method checks that the brackets in the string form a meaningful pattern. (Technically
+     * parentheses.
+     *
+     * @param a     A string to check the brackets of
+     * @return      True if the brackets make sense, and false otherwise.
+     */
+    private boolean checkBrackets(String a) {
+        int level = 0;
+        for (int i = 0; i < a.length(); i++) {
+            if (a.charAt(i) == '(') {
+                level++;
+            } else if (a.charAt(i) == ')') {
+                level--;
+            }
+            if (level < 0) { return false; }
+        }
+        if (level == 0) { return true; }
+        return false;
+    }
+
+    /**
+     * Makes the error window pop up or disappear. The show method should only be called after
+     * setting the text in the error window.
+     *
+     * TODO: turn this into showError(String title, String body, String Response1, String Response2,
+     * todo  _?_ responseAction1, _?_ responseAction2)
+     */
+    private void showError() {
+        errorView.setVisibility(View.VISIBLE);
+        dxdtEditText.setEnabled(false);
+        dydtEditText.setEnabled(false);
+        xminEditText.setEnabled(false);
+        xmaxEditText.setEnabled(false);
+        yminEditText.setEnabled(false);
+        ymaxEditText.setEnabled(false);
+        param1SymbolET.setEnabled(false);
+        param2SymbolET.setEnabled(false);
+        param3SymbolET.setEnabled(false);
+        param4SymbolET.setEnabled(false);
+        param5SymbolET.setEnabled(false);
+        param6SymbolET.setEnabled(false);
+        param1ValueET.setEnabled(false);
+        param2ValueET.setEnabled(false);
+        param3ValueET.setEnabled(false);
+        param4ValueET.setEnabled(false);
+        param5ValueET.setEnabled(false);
+        param6ValueET.setEnabled(false);
+        arrowSizeEditText.setEnabled(false);
+        stepMaxET.setEnabled(false);
+        stepMinET.setEnabled(false);
+        timeMaxET.setEnabled(false);
+        timeMinET.setEnabled(false);
+        outsideSw.setEnabled(false);
+        k_eqn_xyab.enabled = false;
+        k_int.enabled = false;
+        k_abc.enabled = false;
+    }
+    public void hideError(View view) {
+        errorView.setVisibility(View.GONE);
+        dxdtEditText.setEnabled(true);
+        dydtEditText.setEnabled(true);
+        xminEditText.setEnabled(true);
+        xmaxEditText.setEnabled(true);
+        yminEditText.setEnabled(true);
+        ymaxEditText.setEnabled(true);
+        param1SymbolET.setEnabled(true);
+        param2SymbolET.setEnabled(true);
+        param3SymbolET.setEnabled(true);
+        param4SymbolET.setEnabled(true);
+        param5SymbolET.setEnabled(true);
+        param6SymbolET.setEnabled(true);
+        param1ValueET.setEnabled(true);
+        param2ValueET.setEnabled(true);
+        param3ValueET.setEnabled(true);
+        param4ValueET.setEnabled(true);
+        param5ValueET.setEnabled(true);
+        param6ValueET.setEnabled(true);
+        arrowSizeEditText.setEnabled(true);
+        stepMaxET.setEnabled(true);
+        stepMinET.setEnabled(true);
+        timeMaxET.setEnabled(true);
+        timeMinET.setEnabled(true);
+        outsideSw.setEnabled(true);
+        k_eqn_xyab.enabled = true;
+        k_int.enabled = true;
+        k_abc.enabled = true;
+    }
+
+    // TODO: Export figure options
+}

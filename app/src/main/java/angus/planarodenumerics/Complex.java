@@ -4,6 +4,12 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+/**
+ * This class is an implementation of complex numbers using doubles to store the real and imaginary
+ * parts. All calculations are done in cartesian form except the sqrt function.
+ *
+ * TODO: Add a power function for completeness
+ */
 public class Complex {
     double re;
     double im;

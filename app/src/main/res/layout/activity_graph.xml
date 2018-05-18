@@ -14,13 +14,14 @@
         android:layout_height="0dp"
         android:background="@android:color/background_light"
         android:onClick="show_eigenstuff"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/graphView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/dxdtView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,6 +36,7 @@
         app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/dydtView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,6 +62,7 @@
         app:srcCompat="@drawable/white_pixel" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/timeView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -84,49 +87,30 @@
     <Button
         android:id="@+id/solutionButton"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:background="?attr/android:colorPrimary"
         android:onClick="selectSolution"
+        android:text="Solutions"
         android:textColor="@android:color/white"
-        android:text="Solution"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideTextView"
+        app:layout_constraintHorizontal_bias="0.6667"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/zoomButton"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:background="?attr/android:colorPrimary"
-        android:onClick="selectZoom"
-        android:textColor="@android:color/white"
-        android:text="Zoom/Pan"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/solutionButton"
-        app:layout_constraintStart_toStartOf="@+id/toolbar" />
 
     <Button
         android:id="@+id/equilibriumButton"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:background="?attr/android:colorPrimary"
         android:onClick="selectEquilibrium"
+        android:text="Equilibria"
         android:textColor="@android:color/white"
-        android:text="Equilibrium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/toolbar"
-        app:layout_constraintStart_toEndOf="@+id/solutionButton" />
+        app:layout_constraintHorizontal_bias="0.3333"
+        app:layout_constraintStart_toEndOf="@+id/guideTextView" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/graph_toolbar"
@@ -140,6 +124,7 @@
         app:theme="@style/ToolbarStyle" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/jacobainLeftBracketTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -154,6 +139,7 @@
         app:layout_constraintTop_toTopOf="@+id/dxdtView" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/jEqualsTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -168,6 +154,7 @@
         app:layout_constraintTop_toTopOf="@+id/dxdtView" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/jacobianRightBracketTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -178,6 +165,7 @@
         app:layout_constraintTop_toTopOf="@+id/jacobainLeftBracketTextView" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/equilibruimClassificaitonTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -198,6 +186,7 @@
         app:layout_constraintTop_toTopOf="@+id/constraintLayout">
 
         <TextView
+        android:textColor="@android:color/black"
             android:id="@+id/j22TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -207,6 +196,7 @@
             app:layout_constraintTop_toBottomOf="@+id/j12TextView" />
 
         <TextView
+        android:textColor="@android:color/black"
             android:id="@+id/j12TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -225,6 +215,7 @@
         app:layout_constraintTop_toTopOf="@+id/dxdtView">
 
         <TextView
+        android:textColor="@android:color/black"
             android:id="@+id/j11TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -234,6 +225,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+        android:textColor="@android:color/black"
             android:id="@+id/j21TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -245,6 +237,7 @@
     </android.support.constraint.ConstraintLayout>
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/eigenView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -258,6 +251,7 @@
         app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/eigenView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -268,5 +262,43 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dxdtView" />
+
+    <TextView
+        android:id="@+id/guideTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/toolbar" />
+
+    <Button
+        android:id="@+id/stopButton"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:onClick="stopCalculations"
+        android:text="Stop"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/graphView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_toolbar" />
+
+    <TextView
+        android:id="@+id/tapInstructionTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="&lt;- tap"
+        android:textColor="@color/colorErrorDarkTransparent"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/equilibruimClassificaitonTextView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/jacobianRightBracketTextView"
+        app:layout_constraintTop_toTopOf="@+id/equilibruimClassificaitonTextView" />
 
 </android.support.constraint.ConstraintLayout>

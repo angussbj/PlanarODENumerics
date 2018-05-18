@@ -15,23 +15,24 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+/**
+ * This class determines the behaviours of the keyboards in this app.
+ */
 public class CustomKeyboard {
 
     private KeyboardView keyboardView;
     private Activity hostActivity;
     private Keyboard keyboardMain;
     private Keyboard keyboardEqnxyab;
-    private Keyboard keyboardEqnab;
-    private Keyboard keyboardEqn;
     private Keyboard keyboardFns;
     private Keyboard keyboardLower;
     private Keyboard keyboardUpper;
-    private Keyboard keyboardInt;
     private Keyboard keyboardLowerLettersOnly;
     private Keyboard keyboardUpperLettersOnly;
+    public boolean enabled;
 
 
-    // The keyboard listener
+    // The keyboard listener gives each keycode (given to it by a keypress) an action to perform
     private KeyboardView.OnKeyboardActionListener eqnKeyboardListener1 = new KeyboardView.OnKeyboardActionListener() {
         @Override
         public void onPress(int primaryCode) {
@@ -43,14 +44,24 @@ public class CustomKeyboard {
 
         }
 
+        /**
+         * This is the method where stuff actually happens.
+         *
+         * @param primaryCode   The code of the key that was pressed to trigger this event if
+         *                      multiple keys are pressed
+         * @param keyCodes      The codes of all the keys being pressed
+         */
         @Override
         public void onKey(int primaryCode, int[] keyCodes) {
+
+            if (!enabled) { return; }
 
             // Get edit text and put its text in an editable
             View focusCurrent = hostActivity.getWindow().getCurrentFocus();
             EditText edittext = (EditText) focusCurrent;
             Editable editable = edittext.getText();
             int start = edittext.getSelectionStart();
+
             // Deal with the keypress
             switch (primaryCode) {
                 case 1000:          // Delete
@@ -279,6 +290,15 @@ public class CustomKeyboard {
         }
     };
 
+    /**
+     * This method creates an instance of this class for a particular rootLayout like the integer
+     * keyboard, the usual maths keyboard, or the qwerty keyboard.
+     *
+     * @param host              The activity this keyboard will be used in.
+     * @param keyboardViewId    The view the keyboard will be shown in
+     * @param rootLayoutId      The keyboard that will first pop up when you tap a text field that
+     *                          is registered with this keyboard.
+     */
     CustomKeyboard(Activity host, int keyboardViewId, int rootLayoutId) {
         hostActivity = host;
         keyboardView = host.findViewById(keyboardViewId);
@@ -287,32 +307,39 @@ public class CustomKeyboard {
 
         // Set up all the keyboard formats that we might use
         keyboardEqnxyab = new Keyboard(host, R.layout.keyboard);
-        keyboardEqnab = new Keyboard(host, R.layout.keyboard);
-        keyboardEqn = new Keyboard(host, R.layout.keyboard);
         keyboardFns = new Keyboard(host, R.layout.keyboard_more_functions);
         keyboardLower = new Keyboard(host, R.layout.keyboard_lower);
         keyboardUpper = new Keyboard(host, R.layout.keyboard_upper);
-        keyboardInt = new Keyboard(host, R.layout.keyboard_int);
         keyboardLowerLettersOnly = new Keyboard(host, R.layout.keyboard_lower_letters_only);
         keyboardUpperLettersOnly = new Keyboard(host, R.layout.keyboard_upper_letters_only);
 
-        // Disable key previews
-        //keyboardView.setPreviewEnabled(false);
-        //keyboardView.setBackgroundColor(Color.WHITE);
-        //keyboardView.setDrawingCacheBackgroundColor(Color.WHITE);
+        enabled = true;
     }
 
+    /**
+     * This method sets the keyboard to the root keyboard and makes it appear on the screen
+     *
+     * @param view  The view from which to hide the usual keyboard
+     */
     private void showKeyboard(View view) {
+        // Hide the usual keyboard
         if (view != null) {
             ((InputMethodManager) hostActivity.getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+
+        // Set and show the usual keyboard
         keyboardView.setKeyboard(keyboardMain);
         keyboardView.setVisibility(View.VISIBLE);
         keyboardView.setEnabled(true);
+
+        // Make sure the cursor is visible
         EditText et = (EditText) hostActivity.getWindow().getCurrentFocus();
         if (et != null) { et.setCursorVisible(true); }
     }
 
+    /**
+     * Hides the keyboard and cursor TODO: throw focus to the focusonme button so that doesn't need to happen wherever it's currently happening?
+     */
     public void hideKeyboard() {
         keyboardView.setVisibility(View.GONE);
         keyboardView.setEnabled(false);
@@ -320,9 +347,20 @@ public class CustomKeyboard {
         if (et != null) { et.setCursorVisible(false); }
     }
 
+    /**
+     * This method tells a keypress whether it should type "x" (false) or "*x" (true) when the x key
+     * (or another key that indicates the beginning of an expression) is pressed. This is how the
+     * user can type "2xy" and have the text field show "2*x*y" which Eval.eval can understand.
+     *
+     * @param e         The editable containing the text in the text field being edited
+     * @param cursor    The cursors position in the editable
+     * @return          True if "*" should precede the symobol typed for eval to be able to
+     *                  understand it and false otherwise.
+     */
     private boolean needsTimes(Editable e, int cursor) {
         if (cursor == 0) { return false; }
         String s = e.toString();
+        s = s.substring(0, cursor);
         if (s.length() == 0) { return false; }
         String a = s.substring(s.length() - 1);
         while (a.equals(" ")) {
@@ -361,6 +399,11 @@ public class CustomKeyboard {
         return true;
     }
 
+    /**
+     * This method is called when the done button is pressed. There are some pairs of text fields
+     * where only one should have text at any point in time. If the user has just filled one such
+     * text field, this method empties the other.
+     */
     public void check_exclusions() {
         int focusId = hostActivity.getWindow().getCurrentFocus().getId();
         if (focusId == R.id.maxNegativeStepsEditText){
@@ -385,6 +428,14 @@ public class CustomKeyboard {
         }
     }
 
+    /**
+     * This method ensures that the edit text it's called on has this keyboard used as it's main
+     * input method. It also sets up the exclusions so text fields that shouldn't be full at the
+     * same time can be emptied by changing focus where appropriate.
+     *
+     * @param e             The editText field to use this keyboard
+     * @param exclusion     The editText field that should be empty if this is full
+     */
     public void registerEditText(EditText e, EditText exclusion) {
         final EditText et = e;
         final EditText ex = exclusion;
@@ -436,6 +487,12 @@ public class CustomKeyboard {
 
     }
 
+    /**
+     * This method ensures that the edit text it's called on has this keyboard used as it's main
+     * input method.
+     *
+     * @param e             The editText field to use this keyboard
+     */
     public void registerEditText(EditText e) {
         e.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
